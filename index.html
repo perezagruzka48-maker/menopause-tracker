@@ -1865,8 +1865,8 @@ function updateAnalysisButtons(){
   const lastAllUsed=ST.analysisLog.all ? new Date(ST.analysisLog.all) : null;
   const daysSinceAll=lastAllUsed ? Math.floor((today-lastAllUsed)/86400000) : 999;
 
-  if(filledAll<30){
-    const need=30-filledAll;
+  if(filledAll<1){
+    const need=1-filledAll;
     btnA.disabled=true; btnA.style.opacity='0.45'; btnA.style.cursor='default';
     hintA.style.display='block';
     hintA.textContent=`Заполните ещё ${need} ${need===1?'день':need<5?'дня':'дней'} — откроется анализ всего периода.`;
@@ -1893,7 +1893,7 @@ async function runAnalysis(mode='week'){
   }
   if(mode==='all'){
     const allKeys=getEntriesForPeriod(0);
-    if(allKeys.length<30){
+    if(allKeys.length<1){
       const need=30-allKeys.length;
       toast('Заполните ещё '+need+' '+( need===1?'день':need<5?'дня':'дней')+' — тогда откроется анализ периода'); return;
     }
