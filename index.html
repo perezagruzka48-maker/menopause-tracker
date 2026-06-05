@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трансформация в менопаузу</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f5f3ef;
+  --border: rgba(0,0,0,0.07);
+  --border-mid: rgba(0,0,0,0.13);
+  --text: #1a1714;
+  --muted: #8a8178;
+  --accent: #7c6f5e;
+  --accent2: #a08c78;
+  --green: #5a7a5a;
+  --amber: #b5813a;
+  --red: #a34040;
+  --blue: #2A4F85;
+  --purple: #6b5b8a;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; }
+
+/* ── Onboarding ── */
+#onboarding {
+  position: fixed; inset: 0; background: var(--bg); z-index: 100;
+  overflow-y: auto; padding: 24px 16px 40px;
+}
+.ob-wrap { max-width: 480px; margin: 0 auto; }
+.ob-logo { font-family: var(--serif); font-size: 26px; font-weight: 300; color: var(--accent); margin-bottom: 6px; }
+.ob-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+.ob-step { display: none; }
+.ob-step.active { display: block; }
+.ob-title { font-family: var(--serif); font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+.ob-hint { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.ob-field { margin-bottom: 16px; }
+.ob-label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+.ob-input { width: 100%; border: 1px solid var(--border-mid); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; font-family: var(--sans); background: var(--surface); color: var(--text); outline: none; }
+.ob-input:focus { border-color: var(--accent); }
+.ob-select { width: 100%; border: 1px solid var(--border-mid); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 14px; font-family: var(--sans); background: var(--surface); color: var(--text); outline: none; appearance: none; }
+.ob-row { display: flex; gap: 10px; }
+.ob-row .ob-field { flex: 1; }
+.pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill-opt { border: 1px solid var(--border-mid); border-radius: 20px; padding: 6px 14px; font-size: 13px; cursor: pointer; background: var(--surface); color: var(--muted); transition: all .15s; user-select: none; }
+.pill-opt.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ob-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+.ob-progress { display: flex; gap: 5px; }
+.ob-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-mid); transition: background .2s; }
+.ob-dot.active { background: var(--accent); }
+.ob-dot.done { background: var(--accent2); }
+.btn { border: none; border-radius: var(--radius-sm); padding: 10px 22px; font-size: 13px; font-family: var(--sans); font-weight: 500; cursor: pointer; transition: all .15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; color: var(--muted); }
+.sphere-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+.sphere-emoji { width: 38px; border: 1px solid var(--border-mid); border-radius: var(--radius-sm); padding: 7px 0; text-align: center; font-size: 18px; cursor: pointer; background: var(--surface); }
+.sphere-inp { flex: 1; border: 1px solid var(--border-mid); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; font-family: var(--sans); background: var(--surface); color: var(--text); outline: none; }
+.sphere-inp:focus { border-color: var(--accent); }
+.sphere-del { width: 28px; height: 28px; border: none; background: none; color: var(--muted); font-size: 16px; cursor: pointer; }
+.add-sphere { font-size: 12px; color: var(--accent); background: none; border: 1px dashed var(--accent2); border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; font-family: var(--sans); }
+.calc-result { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 10px; font-size: 13px; line-height: 1.8; }
+.calc-result b { color: var(--accent); }
+
+/* ── App ── */
+#app { display: none; }
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 12px 16px 0; position: sticky; top: 0; z-index: 10; }
+.header-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.app-title { font-family: var(--serif); font-size: 22px; font-weight: 300; color: var(--accent); }
+.day-badge { font-size: 11px; color: var(--muted); }
+.tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { background: none; border: none; border-bottom: 2px solid transparent; padding: 8px 12px; font-size: 12px; font-family: var(--sans); color: var(--muted); cursor: pointer; white-space: nowrap; transition: all .15s; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.main { padding: 10px 12px; max-width: 480px; margin: 0 auto; }
+.section { display: none; }
+.section.active { display: block; }
+
+.card { background: var(--surface); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
+.card-title { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 8px; }
+
+/* sliders */
+.slider-block { margin-bottom: 14px; }
+.slider-label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.slider-row { display: flex; align-items: center; gap: 10px; }
+.slider-row input[type=range] { flex: 1; }
+.slider-val { font-size: 16px; font-weight: 500; min-width: 22px; text-align: center; color: var(--accent); }
+.slider-hints { display: flex; justify-content: space-between; margin-top: 2px; }
+.slider-hints span { font-size: 10px; color: var(--muted); }
+
+/* metric grid */
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.metric-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 8px 10px; }
+.metric-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.metric-unit { font-size: 12px; color: var(--muted); }
+.big-inp { border: none; background: transparent; font-size: 22px; font-family: var(--sans); color: var(--text); width: 80px; outline: none; }
+.big-inp::placeholder { color: var(--border-mid); }
+.metric-hint { font-size: 10px; color: var(--muted); margin-top: 6px; }
+.row { display: flex; align-items: center; gap: 4px; }
+.pbar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 4px; }
+.pbar-fill { height: 3px; background: var(--green); border-radius: 2px; transition: width .3s; }
+
+/* checks */
+.check-row { display: flex; align-items: flex-start; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.check-row:last-child { border-bottom: none; }
+.check-box { width: 20px; height: 20px; border: 1.5px solid var(--border-mid); border-radius: 5px; flex-shrink: 0; margin-top: 1px; transition: all .15s; display: flex; align-items: center; justify-content: center; }
+.check-box.checked { background: var(--green); border-color: var(--green); }
+.check-box.checked::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 600; }
+.check-content { flex: 1; }
+.check-label { font-size: 14px; line-height: 1.4; }
+.check-desc { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+/* inputs */
+.inp { border: 1px solid var(--border-mid); border-radius: var(--radius-sm); padding: 7px 10px; font-size: 13px; font-family: var(--sans); background: var(--surface); color: var(--text); outline: none; }
+.inp:focus { border-color: var(--accent); }
+.inp-sm { padding: 5px 7px; font-size: 12px; }
+
+/* cortisol */
+.stress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.stress-label { font-size: 13px; color: var(--muted); min-width: 90px; }
+.tail-btns { display: flex; gap: 6px; }
+.tail-btn { border: 1px solid var(--border-mid); border-radius: 16px; padding: 4px 11px; font-size: 12px; background: var(--surface); color: var(--muted); cursor: pointer; }
+.tail-btn.active { background: var(--amber); border-color: var(--amber); color: #fff; }
+
+/* exercises */
+.ex-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ex-table th { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 4px 0 8px; text-align: left; }
+.ex-table th:not(:first-child) { text-align: center; }
+.ex-table td { padding: 7px 0; vertical-align: top; }
+.ex-table td:not(:first-child) { text-align: center; }
+.ex-name { color: var(--text); line-height: 1.3; }
+.ex-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; cursor: pointer; }
+.ex-desc-full { display: none; font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.6; padding: 8px; background: var(--surface2); border-radius: var(--radius-sm); }
+.ex-desc-full.open { display: block; }
+
+/* zone buttons */
+.zone-btn { border: 1px solid var(--border-mid); border-radius: 16px; padding: 5px 14px; font-size: 12px; font-family: var(--sans); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .15s; }
+
+/* workout history */
+.workout-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.workout-row:last-child { border-bottom: none; }
+.workout-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+
+/* measures */
+.meas-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; }
+.meas-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.meas-date { font-size: 13px; font-weight: 500; }
+.meas-vals { font-size: 13px; color: var(--muted); display: flex; gap: 16px; }
+.meas-diff-neg { font-size: 12px; color: var(--green); font-weight: 500; }
+.meas-diff-pos { font-size: 12px; color: var(--red); font-weight: 500; }
+
+/* cycle */
+.cycle-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+.cycle-day { width: 18px; height: 18px; border-radius: 3px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); }
+
+/* analysis */
+.btn-ai { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; border-radius: var(--radius-sm); padding: 11px 20px; font-size: 13px; font-family: var(--sans); font-weight: 500; cursor: pointer; width: 100%; margin-bottom: 8px; }
+.btn-ai-period { background: linear-gradient(135deg, var(--purple), #8b7aaa); color: #fff; border: none; border-radius: var(--radius-sm); padding: 11px 20px; font-size: 13px; font-family: var(--sans); font-weight: 500; cursor: pointer; width: 100%; margin-bottom: 8px; }
+.ai-result { background: var(--surface); border-radius: var(--radius); padding: 16px; margin-top: 12px; box-shadow: var(--shadow); display: none; }
+.ai-result.visible { display: block; }
+.ai-loading { font-size: 13px; color: var(--muted); text-align: center; padding: 20px; }
+.ai-content { font-size: 13px; line-height: 1.8; color: var(--text); }
+.ai-content strong { color: var(--accent); display: block; margin-top: 12px; margin-bottom: 4px; }
+
+/* log */
+.log-entry { background: var(--surface); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; box-shadow: var(--shadow); cursor: pointer; }
+.log-date { font-size: 12px; font-weight: 500; color: var(--accent); margin-bottom: 6px; }
+.log-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.pill { font-size: 11px; background: var(--surface2); padding: 2px 8px; border-radius: 10px; color: var(--muted); }
+
+/* profile */
+.profile-section { margin-bottom: 20px; }
+.profile-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); margin-bottom: 10px; }
+
+/* toast */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--text); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.flex-end { display: flex; justify-content: flex-end; }
+.empty { text-align: center; padding: 30px 0; color: var(--muted); font-size: 13px; line-height: 2; }
+.empty span { display: block; font-size: 28px; margin-bottom: 8px; }
+
+input[type=range] { -webkit-appearance: none; height: 4px; background: var(--border-mid); border-radius: 2px; outline: none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ══ ОНБОРДИНГ ══ -->
+<div id="onboarding">
+  <div class="ob-wrap">
+    <div class="ob-logo">Трансформация в менопаузу</div>
+    <div class="ob-sub">Персональный трекер здоровья и образа жизни.<br>Настроим его под тебя — займёт 3–4 минуты.</div>
+
+    <!-- Шаг 1: Имя и фаза -->
+    <div class="ob-step active" id="ob-1">
+      <div class="ob-title">Расскажи о себе</div>
+      <div class="ob-hint">Эти данные помогут сделать трекер и анализ персональными.</div>
+      <div class="ob-field">
+        <div class="ob-label">Как тебя зовут?</div>
+        <input class="ob-input" id="ob-name" placeholder="Имя" type="text">
+      </div>
+      <div class="ob-row">
+        <div class="ob-field">
+          <div class="ob-label">Возраст</div>
+          <input class="ob-input" id="ob-age" placeholder="49" type="number" min="35" max="70">
+        </div>
+        <div class="ob-field">
+          <div class="ob-label">Фаза</div>
+          <select class="ob-select" id="ob-phase">
+            <option value="pre">Пременопауза</option>
+            <option value="meno">Менопауза</option>
+            <option value="post">Постменопауза</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Шаг 2: Параметры и цели -->
+    <div class="ob-step" id="ob-2">
+      <div class="ob-title">Параметры тела и цели</div>
+      <div class="ob-hint">Рассчитаем рекомендуемую калорийность и белок — ты сможешь скорректировать.</div>
+      <div class="ob-row">
+        <div class="ob-field">
+          <div class="ob-label">Рост (см)</div>
+          <input class="ob-input" id="ob-height" placeholder="Рост" type="number">
+        </div>
+        <div class="ob-field">
+          <div class="ob-label">Вес (кг)</div>
+          <input class="ob-input" id="ob-weight" placeholder="Вес" type="number" step="0.1">
+        </div>
+      </div>
+      <div class="ob-field">
+        <div class="ob-label">Уровень активности</div>
+        <select class="ob-select" id="ob-activity">
+          <option value="" disabled selected>Выбери уровень</option>
+          <option value="1.2">Минимальный (без тренировок)</option>
+          <option value="1.375">Лёгкий (1–2 тренировки в неделю)</option>
+          <option value="1.55">Умеренный (3–4 тренировки в неделю)</option>
+          <option value="1.725">Высокий (5+ тренировок в неделю)</option>
+        </select>
+      </div>
+      <div class="ob-field">
+        <div class="ob-label">Цель</div>
+        <select class="ob-select" id="ob-goal">
+          <option value="" disabled selected>Выбери цель</option>
+          <option value="lose">Снижение веса</option>
+          <option value="maintain">Поддержание веса</option>
+          <option value="body">Изменение состава тела</option>
+        </select>
+      </div>
+      <div id="ob-calc-result" class="calc-result" style="display:none;"></div>
+      <button class="btn btn-ghost" style="margin-top:10px;font-size:12px;" onclick="calcNutrition()">Рассчитать →</button>
+      <div class="ob-row" style="margin-top:14px;">
+        <div class="ob-field">
+          <div class="ob-label">Цель по калориям</div>
+          <input class="ob-input" id="ob-kcal-goal" placeholder="1500" type="number">
+        </div>
+        <div class="ob-field">
+          <div class="ob-label">Цель по белку (г)</div>
+          <input class="ob-input" id="ob-protein-goal" placeholder="100" type="number">
+        </div>
+      </div>
+    </div>
+
+    <!-- Шаг 3: Симптомы -->
+    <div class="ob-step" id="ob-3">
+      <div class="ob-title">Симптомы для отслеживания</div>
+      <div class="ob-hint">Отметь то что хочешь фиксировать ежедневно. Можно изменить позже в Профиле.</div>
+      <div class="pill-group" id="ob-symptoms">
+        <div class="pill-opt" data-val="hotflash">🔥 Приливы</div>
+        <div class="pill-opt" data-val="anxiety">😰 Тревожность</div>
+        <div class="pill-opt" data-val="brain-fog">🌫 Туман в голове</div>
+        <div class="pill-opt" data-val="joint-pain">🦴 Боли в суставах</div>
+        <div class="pill-opt" data-val="mood-swings">🌊 Перепады настроения</div>
+        <div class="pill-opt" data-val="bloating">🫧 Вздутие</div>
+        <div class="pill-opt" data-val="fatigue">😴 Усталость</div>
+        <div class="pill-opt" data-val="headache">💫 Головная боль</div>
+      </div>
+    </div>
+
+    <!-- Шаг 4: Добавки и гормоны -->
+    <div class="ob-step" id="ob-4">
+      <div class="ob-title">Добавки и гормональная поддержка</div>
+      <div class="ob-hint">Отмеченные появятся на главной странице для ежедневной отметки.</div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;">Добавки</div>
+      <div class="pill-group" id="ob-supplements" style="margin-bottom:16px;">
+        <div class="pill-opt" data-val="magnesium">💊 Магний</div>
+        <div class="pill-opt" data-val="iron">🩸 Железо</div>
+        <div class="pill-opt" data-val="vitd">☀️ Витамин D</div>
+        <div class="pill-opt" data-val="omega">🐟 Омега-3</div>
+        <div class="pill-opt" data-val="bcomplex">💛 B-комплекс</div>
+        <div class="pill-opt" data-val="inositol">🌿 Инозитол</div>
+        <div class="pill-opt" data-val="ashwagandha">🌱 Ашваганда</div>
+        <div class="pill-opt" data-val="collagen">✨ Коллаген</div>
+      </div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;">Гормональная поддержка</div>
+      <div class="pill-group" id="ob-hormones" style="margin-bottom:16px;">
+        <div class="pill-opt" data-val="progesterone">🌙 Прогестерон</div>
+        <div class="pill-opt" data-val="estrogen-gel">💧 Эстроген (гель)</div>
+        <div class="pill-opt" data-val="estrogen-patch">🩹 Эстроген (пластырь)</div>
+        <div class="pill-opt" data-val="combined-mht">💊 Комбинированная МГТ</div>
+        <div class="pill-opt" data-val="thyroxine">⚡ Тироксин</div>
+      </div>
+      <div class="ob-field">
+        <div class="ob-label">Своё (через запятую)</div>
+        <input class="ob-input" id="ob-custom-supps" placeholder="Например: Витамин С, Цинк">
+      </div>
+    </div>
+
+<!-- Шаг 5: Модули -->
+    <div class="ob-step" id="ob-5">
+      <div class="ob-title">Настрой трекер под себя</div>
+      <div class="ob-hint">Включи только то, что нужно — трекер подстроится. Всё можно изменить позже в профиле.</div>
+      <div id="ob-module-cycle" class="check-row" onclick="toggleObModule('cycle')" style="padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+        <div class="check-box" id="ob-mod-cb-cycle"></div>
+        <div class="check-content">
+          <div class="check-label">🌙 Менструальный цикл</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Календарь цикла и статистика</div>
+        </div>
+      </div>
+      <div class="check-row" onclick="toggleObModule('stretch')" style="padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+        <div class="check-box" id="ob-mod-cb-stretch"></div>
+        <div class="check-content">
+          <div class="check-label">🧘 Растяжка</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Комплекс упражнений с отметками</div>
+        </div>
+      </div>
+      <div class="check-row" onclick="toggleObModule('face')" style="padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+        <div class="check-box" id="ob-mod-cb-face"></div>
+        <div class="check-content">
+          <div class="check-label">✨ Массаж лица</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Фейсфитнес и лимфодренаж</div>
+        </div>
+      </div>
+      <div class="check-row" onclick="toggleObModule('spheres')" style="padding:12px 0;cursor:pointer;">
+        <div class="check-box" id="ob-mod-cb-spheres"></div>
+        <div class="check-content">
+          <div class="check-label">🎯 Сферы жизни</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Направления которые хочешь двигать каждый день — видны в анализе</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Шаг 6: Сферы (только если включила) -->
+    <div class="ob-step" id="ob-6">
+      <div class="ob-title">Сферы жизни</div>
+      <div class="ob-hint">Добавь 2–5 направлений. Нажми на эмодзи чтобы выбрать другой.</div>
+      <div id="ob-spheres-list"></div>
+      <button class="add-sphere" onclick="addSphere()">+ Добавить сферу</button>
+    </div>
+
+    <!-- Шаг 7: Завершение -->
+    <div class="ob-step" id="ob-7">
+      <div class="ob-title" id="ob-final-title">Всё готово!</div>
+      <div class="ob-hint" id="ob-final-hint"></div>
+      <div class="calc-result" id="ob-summary"></div>
+    </div>
+
+    <div class="ob-nav">
+      <button class="btn btn-ghost" id="ob-back" onclick="obBack()" style="display:none;">← Назад</button>
+      <div class="ob-progress" id="ob-progress"></div>
+      <button class="btn btn-primary" id="ob-next" onclick="obNext()">Далее →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title" id="app-title">Трекер</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="day-badge" id="day-badge"></div>
+        <button onclick="switchTab('profile')" style="background:none;border:none;font-size:18px;cursor:pointer;padding:2px;" title="Профиль">⚙️</button>
+      </div>
+    </div>
+    <div id="challenge-progress" style="padding:6px 0 8px;display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:11px;color:var(--muted);" id="progress-label"></span>
+        <span style="font-size:11px;color:var(--accent);font-weight:500;" id="progress-pct"></span>
+      </div>
+      <div style="height:3px;background:var(--border-mid);border-radius:2px;overflow:hidden;">
+        <div id="progress-fill" style="height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%;"></div>
+      </div>
+    </div>
+    <div class="tabs" id="tabs-container"></div>
+  </div>
+
+  <div class="main">
+
+    <!-- ГЛАВНАЯ -->
+    <div class="section" id="sec-daily">
+
+      <!-- Состояние -->
+      <div class="card">
+        <div class="card-title">Состояние</div>
+        <div class="slider-block" style="margin-bottom:8px;">
+          <div class="slider-label">⚡ Энергия</div>
+          <div class="slider-row">
+            <span style="font-size:11px;color:var(--muted);">0</span>
+            <input type="range" id="sl-energy" min="0" max="10" value="5" oninput="updateSlider('energy',this.value)">
+            <span style="font-size:11px;color:var(--muted);">10</span>
+            <span class="slider-val" id="val-energy">5</span>
+          </div>
+        </div>
+        <div class="slider-block" style="margin-bottom:8px;">
+          <div class="slider-label">🌙 Сон</div>
+          <div class="slider-row">
+            <span style="font-size:11px;color:var(--muted);">0</span>
+            <input type="range" id="sl-sleep" min="0" max="10" value="5" oninput="updateSlider('sleep',this.value)">
+            <span style="font-size:11px;color:var(--muted);">10</span>
+            <span class="slider-val" id="val-sleep">5</span>
+          </div>
+        </div>
+        <div class="slider-block" style="margin-bottom:0;">
+          <div class="slider-label">☀️ Настроение</div>
+          <div class="slider-row">
+            <span style="font-size:11px;color:var(--muted);">0</span>
+            <input type="range" id="sl-mood" min="0" max="10" value="5" oninput="updateSlider('mood',this.value)">
+            <span style="font-size:11px;color:var(--muted);">10</span>
+            <span class="slider-val" id="val-mood">5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кортизол -->
+      <div class="card">
+        <div class="card-title">Кортизол и стресс</div>
+        <div class="check-row" onclick="toggleCheck('ext-stress')" id="row-ext-stress">
+          <div class="check-box" id="cb-ext-stress"></div>
+          <div class="check-content"><div class="check-label">Внешний стрессор сегодня</div></div>
+        </div>
+        <div id="ext-stress-wrap" style="display:none;margin-top:6px;">
+          <input type="text" class="inp" id="inp-ext-stress" placeholder="Что случилось?" style="width:100%;">
+        </div>
+        <div style="margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:13px;color:var(--muted);">😰 Тревожность</span>
+            <span style="font-size:14px;font-weight:500;color:var(--accent);" id="anxiety-val">0</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;color:var(--muted);">нет</span>
+            <input type="range" id="sl-anxiety" min="0" max="10" value="0" style="flex:1;" oninput="document.getElementById('anxiety-val').textContent=this.value">
+            <span style="font-size:10px;color:var(--muted);">сильная</span>
+          </div>
+          <input type="text" class="inp" id="inp-anxiety-note" placeholder="О чём тревога?" style="width:100%;margin-top:6px;font-size:12px;">
+        </div>
+        <div id="daily-symptoms" style="margin-top:6px;"></div>
+      </div>
+
+      <!-- Питание -->
+      <div class="card">
+        <div class="card-title">Питание</div>
+        <div class="metric-grid" style="gap:6px;margin-bottom:10px;">
+          <div class="metric-card" style="padding:8px 10px;">
+            <div class="metric-lbl">Белок</div>
+            <div class="row"><input class="big-inp" type="number" id="inp-protein" placeholder="—" min="0" max="250" oninput="updateProtein()" style="font-size:20px;"><span class="metric-unit">г</span></div>
+            <div class="pbar"><div class="pbar-fill" id="pbar-protein" style="width:0%"></div></div>
+            <div class="metric-hint" id="hint-protein">цель — г</div>
+          </div>
+          <div class="metric-card" style="padding:8px 10px;">
+            <div class="metric-lbl">Калории</div>
+            <div class="row"><input class="big-inp" type="number" id="inp-kcal" placeholder="—" min="0" max="4000" oninput="updateKcal()" style="font-size:20px;"><span class="metric-unit">ккал</span></div>
+            <div class="pbar"><div class="pbar-fill" id="pbar-kcal" style="width:0%;background:var(--amber);"></div></div>
+            <div class="metric-hint" id="hint-kcal">цель — ккал</div>
+          </div>
+          <div class="metric-card" style="padding:8px 10px;">
+            <div class="metric-lbl">Клетчатка</div>
+            <div class="row"><input class="big-inp" type="number" id="inp-fiber" placeholder="—" min="0" max="100" style="font-size:20px;"><span class="metric-unit">г</span></div>
+            <div class="metric-hint">цель 25–30 г</div>
+          </div>
+          <div class="metric-card" style="padding:8px 10px;">
+            <div class="metric-lbl">Окно питания</div>
+            <div class="row" style="gap:4px;align-items:center;">
+              <input type="text" class="big-inp" id="eat-from" placeholder="11:00" style="font-size:15px;width:46px;">
+              <span style="color:var(--muted);font-size:13px;">→</span>
+              <input type="text" class="big-inp" id="eat-to" placeholder="19:00" style="font-size:15px;width:46px;">
+            </div>
+            <div class="metric-hint">часы</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;" id="nutrition-checks"></div>
+      </div>
+
+      <!-- Добавки (динамические) -->
+      <div class="card" id="card-supplements" style="display:none;">
+        <div class="card-title">Добавки и препараты</div>
+        <div id="daily-supplements"></div>
+      </div>
+
+      <!-- День -->
+      <div class="card">
+        <div class="card-title">День</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;color:var(--muted);">👟 Шагов:</span>
+          <input type="number" class="inp" id="inp-steps" placeholder="—" min="0" max="50000" style="width:100px;">
+        </div>
+      </div>
+
+      <!-- Сферы (динамические) -->
+      <div class="card" id="card-spheres" style="display:none;">
+        <div class="card-title">Сферы — шаг сегодня</div>
+        <div id="daily-spheres"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Заметка</div>
+        <textarea class="inp" id="inp-note" placeholder="Наблюдение, идея, ощущение..." style="width:100%;min-height:50px;resize:none;font-size:13px;line-height:1.6;"></textarea>
+      </div>
+
+      <div id="week-dots" style="display:flex;gap:5px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;"></div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:20px;">
+        <input type="date" id="save-date" style="border:1px solid var(--border-mid);border-radius:var(--radius-sm);padding:7px 10px;font-size:13px;font-family:var(--sans);background:var(--surface);color:var(--text);outline:none;">
+        <button class="btn btn-primary" style="flex:1;" onclick="saveDay()">Сохранить день</button>
+      </div>
+    </div>
+
+    <!-- ТРЕНИРОВКИ -->
+    <div class="section" id="sec-workouts">
+
+      <!-- Последние тренировки -->
+      <div class="card">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Последняя НИЗ</div>
+            <div style="font-size:13px;font-weight:500;" id="last-low">—</div>
+            <div style="font-size:11px;color:var(--muted);" id="days-low"></div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Последняя ВЕРХ</div>
+            <div style="font-size:13px;font-weight:500;" id="last-up">—</div>
+            <div style="font-size:11px;color:var(--muted);" id="days-up"></div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Последнее кардио</div>
+            <div style="font-size:13px;font-weight:500;" id="last-cardio">—</div>
+            <div style="font-size:11px;color:var(--muted);" id="days-cardio"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кардио -->
+      <div class="card">
+        <div class="card-title">Кардио</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div class="metric-card">
+            <div class="metric-lbl" style="color:var(--green);">🟢 Жиросжигание</div>
+            <div class="row"><input type="number" class="big-inp" id="walk-fat" placeholder="—" min="0" max="120" style="font-size:20px;" oninput="updateWalkTotal()"><span class="metric-unit">мин</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl" style="color:var(--blue);">🔵 Аэробная</div>
+            <div class="row"><input type="number" class="big-inp" id="walk-aer" placeholder="—" min="0" max="120" style="font-size:20px;" oninput="updateWalkTotal()"><span class="metric-unit">мин</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl" style="color:var(--red);">🔴 Анаэробная</div>
+            <div class="row"><input type="number" class="big-inp" id="walk-ana" placeholder="—" min="0" max="120" style="font-size:20px;" oninput="updateWalkTotal()"><span class="metric-unit">мин</span></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Итого: <span id="walk-total">0</span> мин</div>
+        <div class="flex-end"><button class="btn btn-primary" onclick="saveCardio()">Сохранить кардио</button></div>
+      </div>
+
+      <!-- Силовая -->
+      <div class="card">
+        <div class="card-title">Силовая тренировка</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="zone-btn" id="str-tab-low" onclick="setStrTab('low')" style="border-color:var(--accent);color:var(--accent);">НИЗ</button>
+          <button class="zone-btn" id="str-tab-up" onclick="setStrTab('up')">ВЕРХ</button>
+        </div>
+        <div id="str-low">
+          <table class="ex-table">
+            <tr><th>Упражнение</th><th>кг</th><th>повт.</th></tr>
+          </table>
+          <div id="ex-low-rows"></div>
+        </div>
+        <div id="str-up" style="display:none;">
+          <table class="ex-table">
+            <tr><th>Упражнение</th><th>кг</th><th>повт.</th></tr>
+          </table>
+          <div id="ex-up-rows"></div>
+        </div>
+        <div class="flex-end" style="margin-top:12px;"><button class="btn btn-primary" onclick="saveStrength()">Сохранить силовую</button></div>
+      </div>
+
+      <!-- История -->
+      <div class="card">
+        <div class="card-title">История тренировок</div>
+        <div id="workout-history"><div class="empty"><span>💪</span>Тренировки появятся здесь.</div></div>
+      </div>
+    </div>
+
+    <!-- РАСТЯЖКА -->
+    <div class="section" id="sec-stretch">
+      <div class="card">
+        <div class="card-title">Растяжка · полный комплекс · ~25–30 мин</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Статика, без пружинистых движений. Наноси масло перед началом если делаешь после душа.</div>
+        <div id="stretch-exercises"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:12px;color:var(--muted);" id="stretch-progress-text"></div>
+        <button class="btn btn-primary" onclick="saveStretch()">Сохранить</button>
+      </div>
+      <div class="card">
+        <div class="card-title">История практики</div>
+        <div id="stretch-history"></div>
+      </div>
+    </div>
+
+    <!-- ЛИЦО -->
+    <div class="section" id="sec-face">
+      <div class="card">
+        <div class="card-title">Фейсфитнес · ~20 мин</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Наноси масло или сыворотку перед началом.</div>
+        <div id="face-exercises"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-size:12px;color:var(--muted);" id="face-progress-text"></div>
+        <button class="btn btn-primary" onclick="saveFace()">Сохранить</button>
+      </div>
+      <div class="card">
+        <div class="card-title">История практики</div>
+        <div id="face-history"></div>
+      </div>
+    </div>
+
+    <!-- ЗАМЕРЫ -->
+    <div class="section" id="sec-measures">
+      <div class="card">
+        <div class="card-title">Новый замер</div>
+        <div class="row" style="gap:12px;flex-wrap:wrap;">
+          <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Талия (см)</div><input type="number" class="inp" id="inp-waist" placeholder="84" step="0.1" style="width:90px;"></div>
+          <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Вес (кг)</div><input type="number" class="inp" id="inp-weight-m" placeholder="66" step="0.1" style="width:90px;"></div>
+          <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Бёдра (см)</div><input type="number" class="inp" id="inp-hips" placeholder="—" step="0.1" style="width:90px;"></div>
+        </div>
+        <div class="flex-end" style="margin-top:12px;"><button class="btn btn-primary" onclick="saveMeasure()">Сохранить</button></div>
+      </div>
+      <div id="measures-list"></div>
+      <div class="card">
+        <div class="card-title">Прогресс в силовых · НИЗ</div>
+        <div id="strength-progress-low"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Прогресс в силовых · ВЕРХ</div>
+        <div id="strength-progress-up"></div>
+      </div>
+    </div>
+
+    <!-- ЦИКЛ -->
+    <div class="section" id="sec-cycle">
+      <div class="card">
+        <div class="card-title">Цикл · последние 10 недель</div>
+        <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;border-radius:3px;background:rgba(163,64,64,0.35);border:1px solid var(--red);"></div><span style="font-size:11px;color:var(--muted);">Менструация</span></div>
+          <div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:12px;border-radius:3px;background:rgba(181,129,58,0.3);border:1px solid var(--amber);"></div><span style="font-size:11px;color:var(--muted);">Мажущие</span></div>
+        </div>
+        <div id="cycle-grid" class="cycle-grid" style="margin-bottom:16px;"></div>
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Отметить сегодня</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <button onclick="markCycle('mens')" style="background:rgba(163,64,64,0.15);border:1px solid var(--red);color:var(--red);padding:8px 14px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;cursor:pointer;">Менструация</button>
+          <button onclick="markCycle('spot')" style="background:rgba(181,129,58,0.15);border:1px solid var(--amber);color:var(--amber);padding:8px 14px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;cursor:pointer;">Мажущие</button>
+          <button onclick="markCycle('none')" style="background:var(--surface);border:1px solid var(--border-mid);color:var(--muted);padding:8px 14px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:12px;cursor:pointer;">Убрать</button>
+        </div>
+        <div id="cycle-stats" style="font-size:13px;color:var(--muted);line-height:1.8;"></div>
+      </div>
+    </div>
+
+    <!-- АНАЛИЗ -->
+    <div class="section" id="sec-analysis">
+      <div class="card">
+        <div class="card-title">AI-анализ</div>
+        <button class="btn-ai" id="btn-week-analysis" onclick="runAnalysis('week')">✦ Резюме последней недели</button>
+        <div id="hint-week-analysis" style="font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:8px;display:none;"></div>
+        <button class="btn-ai-period" id="btn-all-analysis" onclick="runAnalysis('all')">◈ Анализ всего периода</button>
+        <div id="hint-all-analysis" style="font-size:12px;color:var(--muted);margin-top:4px;display:none;"></div>
+        <div class="ai-result" id="ai-result">
+          <div class="ai-content" id="ai-content"></div>
+        </div>
+      </div>
+      <div class="card" id="corr-card" style="display:none;">
+        <div class="card-title">Корреляции</div>
+        <div id="corr-content"></div>
+      </div>
+    </div>
+
+    <!-- ДНЕВНИК -->
+    <div class="section" id="sec-log">
+      <div id="log-list"></div>
+    </div>
+
+    <!-- ПРОФИЛЬ -->
+    <div class="section" id="sec-profile">
+      <div class="card">
+        <div class="profile-section-title">Личные данные</div>
+        <div class="ob-field">
+          <div class="ob-label">Имя</div>
+          <input class="ob-input" id="p-name" type="text">
+        </div>
+        <div class="ob-row">
+          <div class="ob-field">
+            <div class="ob-label">Возраст</div>
+            <input class="ob-input" id="p-age" type="number">
+          </div>
+          <div class="ob-field">
+            <div class="ob-label">Фаза</div>
+            <select class="ob-select" id="p-phase">
+              <option value="pre">Пременопауза</option>
+              <option value="meno">Менопауза</option>
+              <option value="post">Постменопауза</option>
+            </select>
+          </div>
+        </div>
+        <div class="ob-row">
+          <div class="ob-field">
+            <div class="ob-label">Рост (см)</div>
+            <input class="ob-input" id="p-height" type="number">
+          </div>
+          <div class="ob-field">
+            <div class="ob-label">Вес (кг)</div>
+            <input class="ob-input" id="p-weight" type="number" step="0.1">
+          </div>
+        </div>
+        <div class="ob-row">
+          <div class="ob-field">
+            <div class="ob-label">Цель по калориям</div>
+            <input class="ob-input" id="p-kcal-goal" type="number">
+          </div>
+          <div class="ob-field">
+            <div class="ob-label">Цель по белку (г)</div>
+            <input class="ob-input" id="p-protein-goal" type="number">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="profile-section-title">Симптомы для отслеживания</div>
+        <div class="pill-group" id="p-symptoms"></div>
+      </div>
+
+      <div class="card">
+        <div class="profile-section-title">Добавки</div>
+        <div class="pill-group" id="p-supplements"></div>
+        <div style="margin-top:10px;">
+          <div class="ob-label">Свои добавки (через запятую)</div>
+          <input class="ob-input" id="p-custom-supps" placeholder="Например: Витамин С, Цинк" type="text">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="profile-section-title">Гормональная поддержка</div>
+        <div class="pill-group" id="p-hormones"></div>
+      </div>
+
+      <div class="card">
+        <div class="profile-section-title">Модули трекера</div>
+        <div id="pm-cycle" class="check-row" onclick="toggleProfileModule('cycle')" style="padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+          <div class="check-box" id="pm-cb-cycle"></div>
+          <div class="check-content"><div class="check-label">🌙 Менструальный цикл</div></div>
+        </div>
+        <div class="check-row" onclick="toggleProfileModule('stretch')" style="padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+          <div class="check-box" id="pm-cb-stretch"></div>
+          <div class="check-content"><div class="check-label">🧘 Растяжка</div></div>
+        </div>
+        <div class="check-row" onclick="toggleProfileModule('face')" style="padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+          <div class="check-box" id="pm-cb-face"></div>
+          <div class="check-content"><div class="check-label">✨ Массаж лица</div></div>
+        </div>
+        <div class="check-row" onclick="toggleProfileModule('spheres')" style="padding:10px 0;cursor:pointer;">
+          <div class="check-box" id="pm-cb-spheres"></div>
+          <div class="check-content"><div class="check-label">🎯 Сферы жизни</div></div>
+        </div>
+      </div>
+
+      <div class="card" id="p-spheres-card" style="display:none;">
+        <div class="profile-section-title">Сферы жизни</div>
+        <div id="p-spheres-list"></div>
+        <button class="add-sphere" onclick="addProfileSphere()">+ Добавить сферу</button>
+      </div>
+
+      <div class="card">
+        <div class="profile-section-title">Упражнения НИЗ</div>
+        <div id="p-ex-low"></div>
+        <button class="add-sphere" style="margin-top:8px;" onclick="addExercise('low')">+ Добавить упражнение</button>
+      </div>
+
+      <div class="card">
+        <div class="profile-section-title">Упражнения ВЕРХ</div>
+        <div id="p-ex-up"></div>
+        <button class="add-sphere" style="margin-top:8px;" onclick="addExercise('up')">+ Добавить упражнение</button>
+      </div>
+
+      <div class="flex-end" style="margin-bottom:30px;">
+        <button class="btn btn-primary" onclick="saveProfile()">Сохранить профиль</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ DATA ══
+const STORAGE_KEY = 'meno_tracker_v1';
+let ST = {
+  profile: null,
+  entries: {},
+  workouts: [],
+  measures: [],
+  cycle: {},
+  stretchEntries: {},
+  faceEntries: {},
+  analysisLog: {}
+};
+let checks = {};
+let stressTail = 0;
+let curStrTab = 'low';
+let analysisPeriod = 7;
+let stretchChecks = {};
+let faceChecks = {};
+
+// ══ DEFAULT DATA ══
+const DEFAULT_EX_LOW = [
+  {id:'squat', name:'Приседания', desc:'Ноги на ширине плеч или чуть шире, носки слегка развёрнуты. Спина прямая, грудь вперёд. Опускаешься до угла 90° или ниже — колени над носками, не заваливаются внутрь. На выдохе поднимаешься, напрягая ягодицы в верхней точке.'},
+  {id:'rdl', name:'Румынская тяга', desc:'Ноги на ширине таза, гантели перед бёдрами. Наклон от таза — не от поясницы, спина нейтральная. Гантели скользят по ногам вниз до ощущения натяжения в задней поверхности бедра. Возврат через ягодицы.'},
+  {id:'lunge', name:'Выпады назад', desc:'Стоя, одна нога отступает назад — опускаешь заднее колено к полу. Переднее колено над носком. Центр тяжести над передней ногой. Возврат вперёд через пятку передней ноги.'},
+  {id:'bridge', name:'Ягодичный мост', desc:'Лёжа на спине, ступни у ягодиц. Поднимаешь таз вверх — тело от плеч до колен в одну линию. Удержание 2 сек, сжимаешь ягодицы. Для усиления — одна нога вытянута или опора спиной на скамью.'},
+  {id:'kickback', name:'Отведение ноги назад', desc:'На коленях и локтях. Поясница нейтральная — не прогибается. Нога согнута под 90°, поднимаешь бедро до параллели с полом — пятка смотрит в потолок. Таз не поворачивается. Удержание 1–2 сек наверху.'},
+  {id:'sidekick', name:'Отведение ноги в сторону', desc:'Та же позиция на коленях и локтях. Нога согнута, поднимаешь колено в сторону — как открываешь книгу. Таз не заваливается в противоположную сторону. Удержание 1–2 сек.'},
+  {id:'dead-bug', name:'Мёртвый жук', desc:'Лёжа на спине, поясница прижата к полу. Руки вверх, ноги под углом 90°. Одновременно опускаешь противоположную руку и ногу — не касаясь пола. Поясница не отрывается. Возврат. 8–10 повт × 3 подхода.'},
+  {id:'pushup-knee', name:'Отжимания с колен', desc:'Колени на полу, тело в одну линию от колен до макушки. Руки чуть шире плеч. Опускаешь грудь к полу — локти под углом 45° к телу. 8–12 повт × 3 подхода.'},
+];
+
+const DEFAULT_EX_UP = [
+  {id:'lat-pull', name:'Тяга на широчайшую', desc:'Сидя или стоя в наклоне, тяга резинки или гантели от уровня головы вниз к бедру — локоть идёт вдоль тела. Лопатка опускается и сводится. 10–12 повт × 3.'},
+  {id:'lateral-up', name:'Разведение в стороны', desc:'Стоя, гантели по бокам. Поднимаешь руки в стороны — только до угла 45° от корпуса, не выше. Это снижает нагрузку на плечевой сустав и акцентирует работу средней дельты. Локоть чуть согнут. Не поднимаешь плечи к ушам. Медленно опускаешь. 12–15 повт × 3.'},
+  {id:'reverse-fly', name:'Обратная бабочка', desc:'В наклоне вперёд, руки вниз. Разводишь в стороны — лопатки сводятся. Не раскачивайся. 10–12 повт × 3.'},
+  {id:'bicep-curl', name:'Бицепс', desc:'Стоя, гантели вдоль тела. Сгибаешь локти — кисти к плечам. Локти прижаты к телу. 10–12 повт × 3.'},
+  {id:'tricep-french', name:'Трицепс (французский)', desc:'Сидя или стоя, гантель за головой двумя руками. Разгибаешь локти вверх — локти смотрят вперёд, не разводи. 9–10 повт × 3.'},
+  {id:'chest-fly', name:'Разведение гантелей лёжа', desc:'Лёжа на скамье или полу, гантели над грудью, локти чуть согнуты. Разводишь в стороны по дуге до лёгкого натяжения в груди. Возврат. 10–12 повт × 3.'},
+  {id:'pushup-up', name:'Отжимания с колен', desc:'С колен, акцент на грудь и трицепс. 8 повт × 3.'},
+  {id:'dead-bug-up', name:'Мёртвый жук', desc:'Поясница прижата к полу. Противоположная рука и нога опускаются. 10 повт × 3.'},
+  {id:'plank', name:'Планка на предплечьях', desc:'Предплечья на полу, тело прямое. Не опускай и не поднимай таз. Дышишь ровно. 30–45 сек × 3 подхода.'},
+];
+
+const STRETCH_EXERCISES = [
+  {id:'s-square', name:'Квадратные бёдра (Eye of needle)', zone:'Тазобедренный', time:'60 сек × 2', desc:'Лёжа на спине, одна лодыжка на колено другой ноги. Тянешь ноги к груди. Голова на полу, поясница расслаблена. Чувствуешь глубокое растяжение в ягодице. Начинай с этого упражнения.'},
+
+  {id:'s-lizard', name:'Ящерица (Lizard)', zone:'Тазобедренный', time:'45 сек × 2', desc:'Из выпада — передняя нога снаружи от руки, задняя прямая. Таз опускаешь вниз, грудь вперёд. Можно опустить заднее колено на пол.'},
+  {id:'s-butterfly', name:'Бабочка', zone:'Тазобедренный', time:'60 сек', desc:'Сидя, стопы вместе, колени в стороны. Руки держат стопы, локтями мягко давишь на бёдра вниз. Наклон вперёд от таза.'},
+  {id:'s-catcow', name:'Кошка-корова', zone:'Позвоночник', time:'10 циклов', desc:'На четвереньках. Вдох — прогиб, живот вниз (корова). Выдох — округление, пупок к позвоночнику (кошка). Медленно.'},
+  {id:'s-thread', name:'Нить в иголку', zone:'Позвоночник', time:'45 сек × 2', desc:'На четвереньках. Одну руку скользишь под другой — плечо и ухо опускаются на пол. Таз над коленями. Ротация грудного отдела.'},
+  {id:'s-openbook', name:'Открытая книга', zone:'Позвоночник', time:'45 сек × 2', desc:'Лёжа на боку, колени согнуты под 90°, руки вытянуты вперёд. Верхняя рука уходит назад, разворачивая грудную клетку. Таз и колени остаются на месте. Дышишь в раскрытую сторону.'},
+  {id:'s-forwardfold', name:'Наклон сидя', zone:'Задняя поверхность', time:'60 сек', desc:'Сидя, ноги прямые. Наклон от таза — тянешься грудью к ногам. Инициируешь движение тазом, не поясницей.'},
+  {id:'s-quad', name:'Растяжка квадрицепса', zone:'Квадрицепс', time:'45 сек × 2', desc:'Лёжа на боку. Верхней рукой тянешь пятку к ягодице. Колено направлено вниз, бёдра вместе. Поясница нейтральная.'},
+  {id:'s-chestwall', name:'Растяжка груди у стены', zone:'Плечи и грудь', time:'30 сек × 2', desc:'Боком к стене, рука ладонью в стену на уровне плеча. Медленно разворачиваешь корпус от стены. Не запрокидывай голову.'},
+  {id:'s-crossarm', name:'Поперечная растяжка плеча', zone:'Плечи и грудь', time:'30 сек × 2', desc:'Одна рука горизонтально пересекает грудь. Другой рукой прижимаешь её за предплечье. Плечо опущено.'},
+  {id:'s-child', name:'Поза ребёнка', zone:'Завершение', time:'2 мин', desc:'Колени широко, таз к пяткам. Руки вытянуты вперёд, лоб на полу. Дышишь в спину — рёбра расходятся на вдохе.'},
+];
+
+const FACE_EXERCISES = [
+  {id:'f-apo', name:'Массаж апоневроза', zone:'Разогрев', time:'2 мин', desc:'Ладони на волосистую часть головы. Смещаешь кожу вместе с апоневрозом относительно кости: вперёд-назад, потом круговые движения. Снимает хронический тонус лобной мышцы.'},
+  {id:'f-forehead-neutral', name:'Нейтральное положение бровей', zone:'Лоб', time:'5 повт × 30 сек', desc:'Указательные пальцы горизонтально на брови, лёгкое давление вниз. Смотришь прямо с расслабленным лбом, не поднимая брови. Держишь 30 сек, убираешь пальцы, сохраняешь ощущение ещё 30 сек.'},
+  {id:'f-forehead-resist', name:'Сопротивление при подъёме бровей', zone:'Лоб', time:'10 повт', desc:'Ладони плашмя на лоб, пальцы к центру, плотный контакт. Медленно пытаешься поднять брови против сопротивления рук. 5 сек напряжение, 5 сек расслабление. После — костяшками разглаживай от центра к вискам, 1 мин.'},
+  {id:'f-glabella-horiz', name:'Поперечная морщина переносицы', zone:'Переносица', time:'10 повт', desc:'Указательный палец горизонтально над переносицей. Пытаешься нахмуриться — палец не даёт коже сложиться. 5 сек, расслабление.'},
+  {id:'f-glabella-vert', name:'Продольные морщины «11»', zone:'Переносица', time:'10 повт', desc:'Два пальца вертикально по обе стороны от складок, мягко растягивают кожу в стороны. В этом положении пытаешься свести брови. После — разглаживай каждую складку снизу вверх, 30 сек.'},
+  {id:'f-eyelid1', name:'Леватор с фиксацией брови', zone:'Глаза', time:'15 повт', desc:'Указательные пальцы под брови — фиксируешь. Медленно закрываешь глаза на ¾ — не до конца — держишь 5 сек, открываешь. Прямая нагрузка на леватор без лобной мышцы.'},
+  {id:'f-eyelid2', name:'Нижнее веко — прищуривание', zone:'Глаза', time:'10 повт × 2', desc:'Лоб и верхнее веко полностью расслаблены. Медленно поднимаешь только нижнее веко вверх — как прищуриваешься снизу. Удержи 3 сек. Каждый глаз отдельно.'},
+  {id:'f-eyelid3', name:'Взгляд вниз-вверх с фиксацией', zone:'Глаза', time:'10 повт', desc:'Палец удерживает бровь. Глаза медленно вниз — пауза 2 сек — максимально вверх — пауза 2 сек. Без фиксации брови упражнение не работает.'},
+  {id:'f-nasolabial1', name:'Подъём верхней губы', zone:'Носогубные складки', time:'10 повт', desc:'Указательные пальцы вдоль носогубных складок. Медленно поднимаешь верхнюю губу вверх против сопротивления пальцев. 5 сек удержание.'},
+  {id:'f-nasolabial2', name:'Улыбка с подъёмом щёк', zone:'Носогубные складки', time:'10 повт', desc:'Губы сомкнуты. Улыбаешься широко — углы к скулам, не к ушам — щёки поднимаются к глазам. Пальцы на носогубных складках — лёгкое сопротивление. 5 сек.'},
+  {id:'f-jowls1', name:'Нижняя губа на зубы', zone:'Брыли', time:'10 повт', desc:'Рот слегка приоткрыт. Нижнюю губу натягиваешь на нижние зубы. В этом положении медленно улыбаешься — углы вверх и в стороны. 5 сек удержание.'},
+  {id:'f-jowls2', name:'Поцелуй в потолок', zone:'Брыли и шея', time:'15 повт', desc:'Запрокинь голову. Вытяни губы вперёд максимально. Держи 5 сек — натяжение под подбородком. Потом в этом же положении широко улыбнись, 10 повт.'},
+  {id:'f-chin', name:'Язык к нёбу + сопротивление', zone:'Второй подбородок', time:'15 повт', desc:'Язык прижат к нёбу — держишь всё время. Кулак под подбородок снизу. Пытаешься опустить подбородок к груди — кулак создаёт сопротивление. 5 сек изометрии. Без языка к нёбу — половина эффекта теряется.'},
+  {id:'f-lymph', name:'Лимфодренажный массаж', zone:'Завершение', time:'2 мин', desc:'Лёгкие поглаживания от центра лба к вискам, от носа по скулам к ушам, от подбородка к мочкам. Потом вниз по шее к ключицам. Давление минимальное.'},
+];
+
+const SYMPTOM_LABELS = {
+  'hotflash': '🔥 Приливы',
+  'anxiety': '😰 Тревожность',
+  'brain-fog': '🌫 Туман в голове',
+  'joint-pain': '🦴 Боли в суставах',
+  'mood-swings': '🌊 Перепады настроения',
+  'bloating': '🫧 Вздутие',
+  'fatigue': '😴 Усталость',
+  'headache': '💫 Головная боль',
+};
+
+const SUPPLEMENT_LABELS = {
+  'magnesium': '💊 Магний',
+  'iron': '🩸 Железо',
+  'vitd': '☀️ Витамин D',
+  'omega': '🐟 Омега-3',
+  'bcomplex': '💛 B-комплекс',
+  'inositol': '🌿 Инозитол',
+  'ashwagandha': '🌱 Ашваганда',
+  'collagen': '✨ Коллаген',
+  'progesterone': '🌙 Прогестерон',
+  'estrogen-gel': '💧 Эстроген (гель)',
+  'estrogen-patch': '🩹 Эстроген (пластырь)',
+  'combined-mht': '💊 Комбинированная МГТ',
+  'thyroxine': '⚡ Тироксин',
+};
+
+const DAY_NAMES=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const MONTHS=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const EMOJIS = ['💪','🌸','❤️','🌿','📚','✍️','🎨','🧘','💼','🏃','🌺','⭐','🦋','🌙','☀️','🎯','🔑','💡','🌊','🍀'];
+
+// ══ UTILS ══
+function load(){
+  try { const d=localStorage.getItem(STORAGE_KEY); if(d) ST=JSON.parse(d); } catch(e){}
+  if(!ST.entries) ST.entries={};
+  if(!ST.workouts) ST.workouts=[];
+  if(!ST.measures) ST.measures=[];
+  if(!ST.cycle) ST.cycle={};
+  if(!ST.stretchEntries) ST.stretchEntries={};
+  if(!ST.faceEntries) ST.faceEntries={};
+  if(!ST.analysisLog) ST.analysisLog={};
+}
+function save(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ST));
+  // Firebase sync if available
+  if(window._firebaseDb && window._firebaseAuth?.currentUser){
+    const uid=window._firebaseAuth.currentUser.uid;
+    const {doc,setDoc}=window._firebaseFirestore;
+    setDoc(doc(window._firebaseDb,'users',uid,'products','menopause-tracker'), ST).catch(e=>console.warn('Firestore save:',e));
+  }
+}
+async function loadFromFirebase(uid){
+  try {
+    const {doc,getDoc}=window._firebaseFirestore;
+    const snap=await getDoc(doc(window._firebaseDb,'users',uid,'products','menopause-tracker'));
+    if(snap.exists()){
+      ST=snap.data();
+      if(!ST.entries) ST.entries={};
+      if(!ST.workouts) ST.workouts=[];
+      if(!ST.measures) ST.measures=[];
+      if(!ST.cycle) ST.cycle={};
+      if(!ST.stretchEntries) ST.stretchEntries={};
+      if(!ST.faceEntries) ST.faceEntries={};
+      if(!ST.analysisLog) ST.analysisLog={};
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ST));
+    }
+  } catch(e){ console.warn('Firestore load:', e); }
+}
+function todayKey(){ const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function pad(n){ return n<10?'0'+n:n; }
+function fmtDate(k){ if(!k) return '—'; const d=new Date(k); return d.getDate()+' '+MONTHS[d.getMonth()]; }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function gv(id){ const el=document.getElementById(id); return el?el.value:''; }
+function gc(id){ const el=document.getElementById(id); return el?el.classList.contains('checked'):false; }
+
+// ══ ONBOARDING ══
+let obStep = 1;
+const obTotal = 7;
+const obModules = {cycle: false, stretch: false, face: false, spheres: false};
+
+function toggleObModule(key){
+  obModules[key] = !obModules[key];
+  const cb = document.getElementById('ob-mod-cb-'+key);
+  if(cb) cb.classList.toggle('checked', obModules[key]);
+  // Цикл скрываем если фаза не pre
+  if(key==='cycle'){
+    const phase = document.getElementById('ob-phase')?.value;
+    if(phase && phase !== 'pre'){ obModules.cycle = false; if(cb) cb.classList.remove('checked'); }
+  }
+}
+const obSpheres = [
+  {emoji:'💼', name:'Работа / проект'},
+  {emoji:'❤️', name:'Отношения'},
+  {emoji:'🌿', name:'Забота о себе'},
+];
+
+function obRender(){
+  for(let i=1;i<=obTotal;i++){
+    const el=document.getElementById('ob-'+i);
+    if(el) el.classList.toggle('active', i===obStep);
+  }
+  document.getElementById('ob-back').style.display = obStep>1?'':'none';
+  document.getElementById('ob-next').textContent = obStep===obTotal?'Начать →':'Далее →';
+  const prog=document.getElementById('ob-progress');
+  prog.innerHTML='';
+  for(let i=1;i<=obTotal;i++){
+    const d=document.createElement('div');
+    d.className='ob-dot'+(i<obStep?' done':i===obStep?' active':'');
+    prog.appendChild(d);
+  }
+  // При показе шага 5 — скрыть цикл если не pre
+  if(obStep===5){
+    const phase = document.getElementById('ob-phase')?.value;
+    const cycleRow = document.getElementById('ob-module-cycle');
+    if(cycleRow) cycleRow.style.display = (phase==='pre') ? '' : 'none';
+  }
+  if(obStep===6) renderObSpheres();
+  if(obStep===7) renderObSummary();
+}
+
+function obNext(){
+  if(obStep===obTotal){ finishOnboarding(); return; }
+  // Пропустить шаг 6 (сферы) если модуль не включён
+  if(obStep===5 && !obModules.spheres){ obStep=7; obRender(); return; }
+  obStep++; obRender();
+}
+function obBack(){
+  if(obStep===7 && !obModules.spheres){ obStep=5; obRender(); return; }
+  if(obStep>1){ obStep--; obRender(); }
+}
+
+function renderObSpheres(){
+  const list=document.getElementById('ob-spheres-list');
+  list.innerHTML='';
+  obSpheres.forEach((s,i)=>{
+    list.appendChild(makeSphereRow(s.emoji, s.name, i, 'ob'));
+  });
+}
+
+function makeSphereRow(emoji, name, idx, prefix){
+  const row=document.createElement('div');
+  row.className='sphere-row';
+  row.innerHTML=`<div class="sphere-emoji" onclick="pickEmoji(${idx},'${prefix}')">${emoji}</div>
+    <input class="sphere-inp" type="text" value="${name}" id="${prefix}-sphere-name-${idx}" placeholder="Название сферы">
+    <button class="sphere-del" onclick="delSphere(${idx},'${prefix}')">×</button>`;
+  row.id=`${prefix}-sphere-row-${idx}`;
+  return row;
+}
+
+function addSphere(){
+  obSpheres.push({emoji:EMOJIS[obSpheres.length%EMOJIS.length], name:''});
+  renderObSpheres();
+}
+
+function delSphere(i, prefix){
+  if(prefix==='ob') obSpheres.splice(i,1);
+  renderObSpheres();
+}
+
+function pickEmoji(idx, prefix){
+  const current = obSpheres[idx]?.emoji || '⭐';
+  const emojiStr = EMOJIS.join(' ');
+  const chosen = prompt(`Выбери эмодзи:\n${emojiStr}\n\nТекущий: ${current}`);
+  if(chosen && chosen.trim()){
+    if(prefix==='ob') obSpheres[idx].emoji = chosen.trim();
+    renderObSpheres();
+  }
+}
+
+function calcNutrition(){
+  const age=parseInt(gv('ob-age'))||45;
+  const h=parseFloat(gv('ob-height'))||164;
+  const w=parseFloat(gv('ob-weight'))||66;
+  const activity=parseFloat(document.getElementById('ob-activity').value)||1.375;
+  const goal=document.getElementById('ob-goal').value;
+
+  // Mifflin-St Jeor для женщин
+  const bmr = 10*w + 6.25*h - 5*age - 161;
+  const tdee = Math.round(bmr * activity);
+  let kcalGoal = goal==='lose' ? Math.round(tdee*0.85) : goal==='maintain' ? tdee : Math.round(tdee*0.9);
+  // В менопаузу снижаем на 100-150 ккал
+  const phase = document.getElementById('ob-phase').value;
+  if(phase==='meno'||phase==='post') kcalGoal -= 100;
+  // Белок: при изменении состава нужно больше — 1.8г/кг, при снижении — 1.6г/кг, поддержание — 1.4г/кг
+  const proteinGoal = Math.round(w * (goal==='body'?1.8:goal==='lose'?1.6:1.4));
+
+  document.getElementById('ob-kcal-goal').value = kcalGoal;
+  document.getElementById('ob-protein-goal').value = proteinGoal;
+
+  const res=document.getElementById('ob-calc-result');
+  res.style.display='block';
+  res.innerHTML=`Базовый обмен: ${Math.round(bmr)} ккал<br>
+С нагрузкой (TDEE): ${tdee} ккал<br>
+<b>Рекомендую: ${kcalGoal} ккал · ${proteinGoal} г белка</b><br>
+<span style="font-size:11px;color:var(--muted);">Можешь скорректировать цифры ниже</span>`;
+}
+
+function getSelectedPills(containerId){
+  const els=document.querySelectorAll(`#${containerId} .pill-opt.selected`);
+  return Array.from(els).map(el=>el.dataset.val);
+}
+
+function renderObSummary(){
+  const name=gv('ob-name')||'Дорогой пользователь';
+  const kcal=gv('ob-kcal-goal')||'—';
+  const protein=gv('ob-protein-goal')||'—';
+  document.getElementById('ob-final-title').textContent=`Привет, ${name}! 🌸`;
+  document.getElementById('ob-final-hint').textContent='Трекер настроен и готов к работе. Вот твои ключевые параметры:';
+  document.getElementById('ob-summary').innerHTML=`
+    <b>Калории:</b> ${kcal} ккал<br>
+    <b>Белок:</b> ${protein} г<br>
+    <b>Симптомы:</b> ${getSelectedPills('ob-symptoms').map(s=>SYMPTOM_LABELS[s]||s).join(', ')||'не выбраны'}<br>
+    <b>Добавки:</b> ${[...getSelectedPills('ob-supplements'),...getSelectedPills('ob-hormones')].map(s=>SUPPLEMENT_LABELS[s]||s).join(', ')||'не выбраны'}<br>
+    <b>Сферы:</b> ${obSpheres.filter(s=>s.name).map(s=>s.emoji+' '+s.name).join(', ')||'не добавлены'}
+  `;
+}
+
+function finishOnboarding(){
+  // Сохраняем сферы из полей ввода
+  obSpheres.forEach((s,i)=>{
+    const inp=document.getElementById(`ob-sphere-name-${i}`);
+    if(inp) s.name=inp.value;
+  });
+
+  // Кастомные добавки
+  const customSupps = gv('ob-custom-supps').split(',').map(s=>s.trim()).filter(Boolean).map(s=>({id:'custom-'+s.replace(/\s+/g,'-').toLowerCase(), label:s}));
+
+  ST.profile = {
+    name: gv('ob-name'),
+    age: parseInt(gv('ob-age'))||45,
+    phase: document.getElementById('ob-phase').value,
+    height: parseFloat(gv('ob-height'))||164,
+    weight: parseFloat(gv('ob-weight'))||66,
+    kcalGoal: parseInt(gv('ob-kcal-goal'))||1500,
+    proteinGoal: parseInt(gv('ob-protein-goal'))||100,
+    symptoms: getSelectedPills('ob-symptoms'),
+    supplements: getSelectedPills('ob-supplements'),
+    hormones: getSelectedPills('ob-hormones'),
+    customSupps: customSupps,
+    spheres: obModules.spheres ? obSpheres.filter(s=>s.name).map(s=>({emoji:s.emoji, name:s.name})) : [],
+    modules: {...obModules},
+    exLow: DEFAULT_EX_LOW.map(e=>({...e})),
+    exUp: DEFAULT_EX_UP.map(e=>({...e})),
+    startDate: todayKey(),
+  };
+  save();
+  document.getElementById('onboarding').style.display='none';
+  initApp();
+}
+
+// ══ APP INIT ══
+function initApp(){
+  const p=ST.profile;
+  document.getElementById('app').style.display='block';
+  document.getElementById('app-title').textContent=p.name?`${p.name}` : 'Трекер';
+
+  // Tabs
+  buildTabs('daily');
+
+  // Update goals
+  document.getElementById('hint-protein').textContent=`цель ${p.proteinGoal}+ г`;
+  document.getElementById('hint-kcal').textContent=`цель ${p.kcalGoal} ккал`;
+
+  // Build dynamic sections
+  buildDailySymptoms();
+  buildDailySupplements();
+  buildDailySpheres();
+  buildStretchExercises();
+  buildFaceExercises();
+  buildWorkoutRows();
+
+  // Date
+  const sd=document.getElementById('save-date');
+  sd.value=todayKey();
+  sd.addEventListener('change',function(){ loadEntryForDate(this.value); renderWeekDots(); });
+
+  // Day badge
+  updateDayBadge(); updateProgressBar(); renderWeekDots();
+
+  // Load today
+  loadEntryForDate(todayKey());
+
+  // Profile form
+  fillProfileForm();
+
+  switchTab('daily');
+}
+
+function updateProgressBar(){
+  const wrap=document.getElementById("challenge-progress");
+  const label=document.getElementById("progress-label");
+  const pct=document.getElementById("progress-pct");
+  const fill=document.getElementById("progress-fill");
+  if(!wrap||!ST.profile?.startDate) return;
+  const start=new Date(ST.profile.startDate); start.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const dayNum=Math.min(Math.round((today-start)/86400000)+1, 90);
+  const percent=Math.round((dayNum/90)*100);
+  wrap.style.display="block";
+  label.textContent="День "+dayNum+" из 90";
+  pct.textContent=percent+"%";
+  fill.style.width=percent+"%";
+}
+
+function updateDayBadge(){
+  const cd=cycleDay();
+  const badge=document.getElementById('day-badge');
+  if(badge) badge.textContent = cd ? `День цикла ${cd} · ${fmtDate(todayKey())}` : fmtDate(todayKey());
+}
+
+function cycleDay(){
+  if(!ST.cycle) return null;
+  const today=todayKey();
+  const mensDays=Object.keys(ST.cycle).filter(k=>ST.cycle[k]==='mens').sort();
+  if(!mensDays.length) return null;
+  const periods=[];
+  let cur=[mensDays[0]];
+  for(let i=1;i<mensDays.length;i++){
+    const prev=new Date(mensDays[i-1]), curr=new Date(mensDays[i]);
+    if((curr-prev)/86400000<=2) cur.push(mensDays[i]);
+    else { periods.push(cur); cur=[mensDays[i]]; }
+  }
+  periods.push(cur);
+  const lastStart=periods[periods.length-1][0];
+  const diff=Math.round((new Date(today)-new Date(lastStart))/86400000)+1;
+  return diff>0?diff:null;
+}
+
+// ── Dynamic builders ──
+function buildDailySymptoms(){
+  const p=ST.profile;
+  const wrap=document.getElementById('daily-symptoms');
+  // Показываем симптомы кроме тревожности — она уже вынесена в слайдер
+  const symptoms=(p.symptoms||[]).filter(s=>s!=='anxiety');
+  if(!symptoms.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML='<div style="border-top:0.5px solid var(--border);margin-top:10px;padding-top:10px;">'+
+    symptoms.map(s=>`
+      <div class="check-row" onclick="toggleCheck('sym-${s}')">
+        <div class="check-box" id="cb-sym-${s}"></div>
+        <div class="check-content"><div class="check-label">${SYMPTOM_LABELS[s]||s}</div></div>
+      </div>`).join('') + '</div>';
+}
+
+function buildDailySupplements(){
+  const p=ST.profile;
+  const customMap={};
+  (p.customSupps||[]).forEach(s=>{
+    if(typeof s==='object') customMap[s.id]=s.label;
+    else customMap['custom-'+s]=s;
+  });
+  const allSupps=[...p.supplements,...p.hormones,...Object.keys(customMap)];
+  const card=document.getElementById('card-supplements');
+  const wrap=document.getElementById('daily-supplements');
+  if(!allSupps.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  wrap.innerHTML=allSupps.map(id=>{
+    const label=SUPPLEMENT_LABELS[id]||customMap[id]||id;
+    return `<div class="check-row" onclick="toggleCheck('supp-${id}')">
+      <div class="check-box" id="cb-supp-${id}"></div>
+      <div class="check-content"><div class="check-label">${label}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function buildDailySpheres(){
+  const p=ST.profile;
+  const card=document.getElementById('card-spheres');
+  const wrap=document.getElementById('daily-spheres');
+  if(!p.spheres?.length){ card.style.display='none'; return; }
+  card.style.display='block';
+  wrap.innerHTML=p.spheres.map((s,i)=>`
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleCheck('sphere-${i}')">
+        <div class="check-box" id="cb-sphere-${i}"></div>
+        <div style="font-size:14px;">${s.emoji} ${s.name}</div>
+      </div>
+      <textarea class="inp" id="sphere-note-${i}" placeholder="Что сделала сегодня?" onclick="event.stopPropagation()"
+        style="width:100%;margin-top:8px;min-height:44px;resize:none;font-size:12px;line-height:1.5;color:var(--muted);"></textarea>
+    </div>`).join('');
+}
+
+function buildStretchExercises(){
+  const wrap=document.getElementById('stretch-exercises');
+  let currentZone='';
+  wrap.innerHTML=STRETCH_EXERCISES.map(ex=>{
+    let zoneHeader='';
+    if(ex.zone!==currentZone){
+      currentZone=ex.zone;
+      zoneHeader=`<div style="font-size:11px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">${ex.zone}${ex.time?' · '+ex.time:''}</div>`;
+    }
+    return `${zoneHeader}<div class="check-row" onclick="toggleStretch('${ex.id}')">
+      <div class="check-box" id="scb-${ex.id}"></div>
+      <div class="check-content">
+        <div class="check-label">${ex.name}${ex.time&&ex.zone!==currentZone?'' : ex.time?' · <span style=\\"color:var(--muted);font-size:12px;\\">'+ex.time+'</span>':''}</div>
+        <div class="check-desc" onclick="event.stopPropagation();toggleDesc('sd-${ex.id}')">▸ техника</div>
+        <div class="ex-desc-full" id="sd-${ex.id}">${ex.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildFaceExercises(){
+  const wrap=document.getElementById('face-exercises');
+  let currentZone='';
+  wrap.innerHTML=FACE_EXERCISES.map(ex=>{
+    let zoneHeader='';
+    if(ex.zone!==currentZone){
+      currentZone=ex.zone;
+      zoneHeader=`<div style="font-size:11px;font-weight:500;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">${ex.zone}${ex.time?' · '+ex.time:''}</div>`;
+    }
+    return `${zoneHeader}<div class="check-row" onclick="toggleFace('${ex.id}')">
+      <div class="check-box" id="fcb-${ex.id}"></div>
+      <div class="check-content">
+        <div class="check-label">${ex.name}</div>
+        <div class="check-desc" onclick="event.stopPropagation();toggleDesc('fd-${ex.id}')">▸ техника · ${ex.time}</div>
+        <div class="ex-desc-full" id="fd-${ex.id}">${ex.desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildWorkoutRows(){
+  const p=ST.profile;
+  const exLow=p.exLow||DEFAULT_EX_LOW;
+  const exUp=p.exUp||DEFAULT_EX_UP;
+  renderExRows('ex-low-rows', exLow, 'low');
+  renderExRows('ex-up-rows', exUp, 'up');
+}
+
+function renderExRows(containerId, exercises, tab){
+  const wrap=document.getElementById(containerId);
+  if(!wrap) return;
+  wrap.innerHTML=exercises.map(ex=>`
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;">
+        <div class="ex-name">${ex.name}</div>
+        <div class="check-desc" onclick="toggleDesc('wd-${tab}-${ex.id}')">▸ техника</div>
+        <div class="ex-desc-full" id="wd-${tab}-${ex.id}">${ex.desc||''}</div>
+      </div>
+      <input type="number" class="inp inp-sm" id="ex-${tab}-${ex.id}-w" placeholder="кг" min="0" step=".5" style="width:56px;">
+      <input type="text" class="inp inp-sm" id="ex-${tab}-${ex.id}-s" placeholder="повт." style="width:58px;">
+    </div>`).join('');
+}
+
+function toggleDesc(id){
+  const el=document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+
+// ══ TABS ══
+function switchTab(t){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  const sec=document.getElementById('sec-'+t);
+  const tab=document.getElementById('tab-'+t);
+  if(sec) sec.classList.add('active');
+  if(tab) tab.classList.add('active');
+  if(t==='workouts'){ renderLastWorkoutDates(); renderWorkoutHistory(); prefillLastWorkout(); }
+  if(t==='stretch'){ loadStretchToday(); renderStretchHistory(); }
+  if(t==='face'){ loadFaceToday(); renderFaceHistory(); }
+  if(t==='measures'){ renderMeasures(); renderStrengthProgress(); }
+  if(t==='cycle'){ renderCycleGrid(); renderCycleStats(); }
+  if(t==='analysis'){ renderCorrelations(); updateAnalysisButtons(); }
+  if(t==='log'){ renderLog(); }
+  if(t==='profile'){ fillProfileForm(); }
+}
+
+// ══ CHECKS ══
+function toggleCheck(id){
+  checks[id]=!checks[id];
+  const el=document.getElementById('cb-'+id);
+  if(el) el.classList.toggle('checked',!!checks[id]);
+  if(id==='ext-stress'){
+    const w=document.getElementById('ext-stress-wrap');
+    if(w) w.style.display=checks[id]?'block':'none';
+  }
+}
+
+function setTail(v){
+  stressTail=v;
+  document.querySelectorAll('.tail-btn').forEach((b,i)=>b.classList.toggle('active',i===v));
+}
+
+// ══ SLIDERS ══
+function updateSlider(id,v){
+  document.getElementById('val-'+id).textContent=v;
+}
+function updateProtein(){
+  const v=parseFloat(gv('inp-protein'))||0;
+  const goal=ST.profile?.proteinGoal||100;
+  const pct=Math.min(100,Math.round(v/goal*100));
+  const el=document.getElementById('pbar-protein');
+  if(el) el.style.width=pct+'%';
+}
+function updateKcal(){
+  const v=parseFloat(gv('inp-kcal'))||0;
+  const goal=ST.profile?.kcalGoal||1500;
+  const pct=Math.min(100,Math.round(v/goal*100));
+  const el=document.getElementById('pbar-kcal');
+  if(el) el.style.width=pct+'%';
+}
+function updateWalkTotal(){
+  const t=(parseInt(gv('walk-fat'))||0)+(parseInt(gv('walk-aer'))||0)+(parseInt(gv('walk-ana'))||0);
+  const el=document.getElementById('walk-total'); if(el) el.textContent=t;
+}
+
+// ══ SAVE DAY ══
+function gatherEntry(){
+  const p=ST.profile;
+  const symData={};
+  p.symptoms?.forEach(s=>{ symData[s]=checks['sym-'+s]; });
+  if(p.symptoms?.includes('anxiety')) symData['anxiety-level']=gv('sl-anxiety');
+  const suppData={};
+  [...(p.supplements||[]),...(p.hormones||[]),...(p.customSupps||[]).map(s=>s)].forEach(s=>{
+    const id=typeof s==='string'?s:s;
+    suppData[id]=checks['supp-'+id];
+  });
+  const sphereData={};
+  p.spheres?.forEach((sp,i)=>{
+    sphereData[i]={done:checks['sphere-'+i], note:gv('sphere-note-'+i)};
+  });
+  const exLow={}, exUp={};
+  p.exLow?.forEach(ex=>{
+    exLow[ex.id]={w:gv('ex-low-'+ex.id+'-w'), s:gv('ex-low-'+ex.id+'-s')};
+  });
+  p.exUp?.forEach(ex=>{
+    exUp[ex.id]={w:gv('ex-up-'+ex.id+'-w'), s:gv('ex-up-'+ex.id+'-s')};
+  });
+  return {
+    energy:gv('sl-energy'), sleep:gv('sl-sleep'), mood:gv('sl-mood'),
+    protein:gv('inp-protein'), kcal:gv('inp-kcal'), fiber:gv('inp-fiber'), carbs:gv('inp-carbs'),
+    eatFrom:gv('eat-from'), eatTo:gv('eat-to'),
+    steps:gv('inp-steps'), note:gv('inp-note'),
+    extStress:checks['ext-stress'], extStressText:gv('inp-ext-stress'),
+    anxiety: gv('sl-anxiety')||0,
+    anxietyNote: gv('inp-anxiety-note'),
+    checks:{...checks}, symptoms:symData, supplements:suppData, spheres:sphereData,
+    didStretch:checks['did-stretch'], didFace:checks['did-face'],
+  };
+}
+
+function saveDay(){
+  const k=gv('save-date')||todayKey();
+  ST.entries[k]=gatherEntry();
+  save();
+  renderLog(); renderWeekDots();
+  toast('День сохранён ✓');
+}
+
+function loadEntryForDate(k){
+  const e=ST.entries[k];
+  checks={};
+  stressTail=0;
+  document.querySelectorAll('.check-box').forEach(el=>el.classList.remove('checked'));
+  document.querySelectorAll('.tail-btn').forEach(b=>b.classList.remove('active'));
+  // Clear fields
+  ['inp-protein','inp-kcal','inp-fiber','inp-carbs','eat-from','eat-to','inp-steps','inp-note','inp-ext-stress','inp-anxiety-note'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['sl-energy','sl-sleep','sl-mood'].forEach(id=>{
+    const el=document.getElementById(id); if(el){ el.value=5; updateSlider(id.replace('sl-',''),5); }
+  });
+  if(!e) return;
+  if(e.energy){ document.getElementById('sl-energy').value=e.energy; updateSlider('energy',e.energy); }
+  if(e.sleep){ document.getElementById('sl-sleep').value=e.sleep; updateSlider('sleep',e.sleep); }
+  if(e.mood){ document.getElementById('sl-mood').value=e.mood; updateSlider('mood',e.mood); }
+  const sv=(id,v)=>{ const el=document.getElementById(id); if(el&&v) el.value=v; };
+  sv('inp-protein',e.protein); updateProtein();
+  sv('inp-kcal',e.kcal); updateKcal();
+  sv('inp-fiber',e.fiber); sv('inp-carbs',e.carbs);
+  sv('eat-from',e.eatFrom); sv('eat-to',e.eatTo);
+  sv('inp-steps',e.steps); sv('inp-note',e.note);
+  if(e.extStress){ checks['ext-stress']=true; document.getElementById('cb-ext-stress')?.classList.add('checked'); const w=document.getElementById('ext-stress-wrap'); if(w) w.style.display='block'; sv('inp-ext-stress',e.extStressText); }
+  if(e.anxiety!==undefined){ const el=document.getElementById('sl-anxiety'); const vl=document.getElementById('anxiety-val'); if(el) el.value=e.anxiety; if(vl) vl.textContent=e.anxiety; }
+  const an=document.getElementById('inp-anxiety-note'); if(an) an.value=e.anxietyNote||'';
+  if(e.checks) Object.keys(e.checks).forEach(id=>{ if(e.checks[id]){ checks[id]=true; document.getElementById('cb-'+id)?.classList.add('checked'); } });
+  const p=ST.profile;
+  if(e.symptoms) p.symptoms?.forEach(s=>{ if(e.symptoms[s]){ checks['sym-'+s]=true; document.getElementById('cb-sym-'+s)?.classList.add('checked'); } });
+  if(e.symptoms?.['anxiety-level']){ const el=document.getElementById('sl-anxiety'); const vl=document.getElementById('anxiety-val'); if(el) el.value=e.symptoms['anxiety-level']; if(vl) vl.textContent=e.symptoms['anxiety-level']; }
+  if(e.supplements) Object.keys(e.supplements).forEach(id=>{ if(e.supplements[id]){ checks['supp-'+id]=true; document.getElementById('cb-supp-'+id)?.classList.add('checked'); } });
+  if(e.spheres) Object.keys(e.spheres).forEach(i=>{ if(e.spheres[i]?.done){ checks['sphere-'+i]=true; document.getElementById('cb-sphere-'+i)?.classList.add('checked'); const ta=document.getElementById('sphere-note-'+i); if(ta){ ta.style.display='block'; ta.value=e.spheres[i].note||''; } } });
+}
+
+// ══ WORKOUTS ══
+function setStrTab(t){
+  curStrTab=t;
+  document.getElementById('str-low').style.display=t==='low'?'block':'none';
+  document.getElementById('str-up').style.display=t==='up'?'block':'none';
+  const bl=document.getElementById('str-tab-low'), bu=document.getElementById('str-tab-up');
+  if(bl){ bl.style.borderColor=t==='low'?'var(--accent)':''; bl.style.color=t==='low'?'var(--accent)':''; }
+  if(bu){ bu.style.borderColor=t==='up'?'var(--accent)':''; bu.style.color=t==='up'?'var(--accent)':''; }
+  prefillLastWorkout();
+}
+
+function prefillLastWorkout(){
+  const p=ST.profile;
+  const last=(ST.workouts||[]).find(w=>w.type==='strength'&&w.tab===curStrTab);
+  if(!last?.exercises) return;
+  const exList=curStrTab==='low'?(p.exLow||DEFAULT_EX_LOW):(p.exUp||DEFAULT_EX_UP);
+  exList.forEach(ex=>{
+    const d=last.exercises[ex.id];
+    if(d){
+      const wEl=document.getElementById(`ex-${curStrTab}-${ex.id}-w`);
+      const sEl=document.getElementById(`ex-${curStrTab}-${ex.id}-s`);
+      if(wEl&&!wEl.value) wEl.value=d.w||'';
+      if(sEl&&!sEl.value) sEl.value=d.s||'';
+    }
+  });
+}
+
+function saveCardio(){
+  const fat=gv('walk-fat'), aer=gv('walk-aer'), ana=gv('walk-ana');
+  if(!fat&&!aer&&!ana){ toast('Введи минуты хотя бы в одной зоне'); return; }
+  const k=gv('save-date')||todayKey();
+  ST.workouts.unshift({date:k, type:'cardio', fat, aer, ana});
+  if(!ST.entries[k]) ST.entries[k]={};
+  if(!ST.entries[k].checks) ST.entries[k].checks={};
+  ST.entries[k].checks['cardio-done']=true;
+  save(); renderWorkoutHistory(); renderLastWorkoutDates();
+  toast('Кардио сохранено ✓');
+}
+
+function saveStrength(){
+  const p=ST.profile;
+  const exList=curStrTab==='low'?(p.exLow||DEFAULT_EX_LOW):(p.exUp||DEFAULT_EX_UP);
+  const exs={};
+  exList.forEach(ex=>{
+    exs[ex.id]={w:gv(`ex-${curStrTab}-${ex.id}-w`), s:gv(`ex-${curStrTab}-${ex.id}-s`)};
+  });
+  const k=gv('save-date')||todayKey();
+  ST.workouts.unshift({date:k, type:'strength', tab:curStrTab, exercises:exs});
+  if(!ST.entries[k]) ST.entries[k]={};
+  if(!ST.entries[k].checks) ST.entries[k].checks={};
+  ST.entries[k].checks['str-done']=true;
+  save(); renderWorkoutHistory(); renderLastWorkoutDates();
+  toast('Силовая сохранена ✓');
+}
+
+function deleteWorkout(i){ ST.workouts.splice(i,1); save(); renderWorkoutHistory(); renderLastWorkoutDates(); }
+
+function renderLastWorkoutDates(){
+  const w=ST.workouts||[];
+  const today=new Date(); today.setHours(0,0,0,0);
+  const ago=k=>{ const d=new Date(k); d.setHours(0,0,0,0); const diff=Math.round((today-d)/86400000); return diff===0?'сегодня':diff===1?'вчера':`${diff} дн. назад`; };
+  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  const lLow=w.find(x=>x.type==='strength'&&x.tab==='low');
+  const lUp=w.find(x=>x.type==='strength'&&x.tab==='up');
+  const lCard=w.find(x=>x.type==='cardio');
+  set('last-low', lLow?fmtDate(lLow.date):'—'); set('days-low', lLow?ago(lLow.date):'ещё не было');
+  set('last-up',  lUp?fmtDate(lUp.date):'—');  set('days-up',  lUp?ago(lUp.date):'ещё не было');
+  set('last-cardio', lCard?fmtDate(lCard.date):'—'); set('days-cardio', lCard?ago(lCard.date):'ещё не было');
+}
+
+function renderWorkoutHistory(){
+  const wrap=document.getElementById('workout-history');
+  if(!wrap) return;
+  if(!ST.workouts?.length){ wrap.innerHTML='<div class="empty"><span>💪</span>Тренировки появятся здесь после первого сохранения.</div>'; return; }
+  const today=new Date(); today.setHours(0,0,0,0);
+  wrap.innerHTML=ST.workouts.slice(0,30).map((w,i)=>{
+    const d=new Date(w.date); d.setHours(0,0,0,0);
+    const diff=Math.round((today-d)/86400000);
+    const ago=diff===0?'сегодня':diff===1?'вчера':`${diff} дн. назад`;
+    if(w.type==='cardio'){
+      const parts=[w.fat?`🟢${w.fat}м`:'',w.aer?`🔵${w.aer}м`:'',w.ana?`🔴${w.ana}м`:''].filter(Boolean).join(' ');
+      return `<div class="workout-row"><span style="font-size:12px;min-width:56px;color:var(--muted);">${fmtDate(w.date)}</span><span class="workout-badge" style="background:rgba(42,79,133,0.12);color:var(--blue);">🏔 Кардио</span><span style="font-size:12px;flex:1;">${parts||'—'}</span><span style="font-size:11px;color:var(--muted);">${ago}</span><button onclick="deleteWorkout(${i})" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0 4px;">✕</button></div>`;
+    } else {
+      const label=w.tab==='up'?'ВЕРХ':'НИЗ';
+      const color=w.tab==='up'?'var(--accent)':'var(--green)';
+      return `<div class="workout-row"><span style="font-size:12px;min-width:56px;color:var(--muted);">${fmtDate(w.date)}</span><span class="workout-badge" style="background:rgba(0,0,0,0.05);color:${color};">💪 Силовая ${label}</span><span style="flex:1;"></span><span style="font-size:11px;color:var(--muted);">${ago}</span><button onclick="deleteWorkout(${i})" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;padding:0 4px;">✕</button></div>`;
+    }
+  }).join('');
+}
+
+// ══ STRETCH ══
+function toggleStretch(id){ stretchChecks[id]=!stretchChecks[id]; document.getElementById('scb-'+id)?.classList.toggle('checked',!!stretchChecks[id]); updateStretchProgress(); }
+function updateStretchProgress(){ const done=STRETCH_EXERCISES.filter(e=>stretchChecks[e.id]).length; const el=document.getElementById('stretch-progress-text'); if(el) el.textContent=`Выполнено ${done} из ${STRETCH_EXERCISES.length}`; }
+function saveStretch(){ const k=gv('save-date')||todayKey(); if(!ST.stretchEntries) ST.stretchEntries={}; ST.stretchEntries[k]={...stretchChecks}; save(); renderStretchHistory(); toast('Растяжка сохранена ✓'); }
+function loadStretchToday(){ stretchChecks={}; const k=todayKey(); if(ST.stretchEntries?.[k]) stretchChecks={...ST.stretchEntries[k]}; STRETCH_EXERCISES.forEach(e=>{ document.getElementById('scb-'+e.id)?.classList.toggle('checked',!!stretchChecks[e.id]); }); updateStretchProgress(); }
+function renderStretchHistory(){
+  const wrap=document.getElementById('stretch-history'); if(!wrap) return;
+  if(!ST.stretchEntries||!Object.keys(ST.stretchEntries).length){ wrap.innerHTML='<div style="font-size:13px;color:var(--muted);">Первая практика появится здесь.</div>'; return; }
+  wrap.innerHTML=Object.keys(ST.stretchEntries).sort().reverse().map(k=>{
+    const done=STRETCH_EXERCISES.filter(e=>ST.stretchEntries[k][e.id]).length;
+    const pct=Math.round(done/STRETCH_EXERCISES.length*100);
+    const col=pct===100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);"><span style="font-size:13px;min-width:60px;">${fmtDate(k)}</span><div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:4px;width:${pct}%;background:${col};border-radius:2px;"></div></div><span style="font-size:12px;color:var(--muted);">${done}/${STRETCH_EXERCISES.length}</span></div>`;
+  }).join('');
+}
+
+// ══ FACE ══
+function toggleFace(id){ faceChecks[id]=!faceChecks[id]; document.getElementById('fcb-'+id)?.classList.toggle('checked',!!faceChecks[id]); updateFaceProgress(); }
+function updateFaceProgress(){ const done=FACE_EXERCISES.filter(e=>faceChecks[e.id]).length; const el=document.getElementById('face-progress-text'); if(el) el.textContent=`Выполнено ${done} из ${FACE_EXERCISES.length}`; }
+function saveFace(){ const k=gv('save-date')||todayKey(); if(!ST.faceEntries) ST.faceEntries={}; ST.faceEntries[k]={...faceChecks}; save(); renderFaceHistory(); toast('Практика сохранена ✓'); }
+function loadFaceToday(){ faceChecks={}; const k=todayKey(); if(ST.faceEntries?.[k]) faceChecks={...ST.faceEntries[k]}; FACE_EXERCISES.forEach(e=>{ document.getElementById('fcb-'+e.id)?.classList.toggle('checked',!!faceChecks[e.id]); }); updateFaceProgress(); }
+function renderFaceHistory(){
+  const wrap=document.getElementById('face-history'); if(!wrap) return;
+  if(!ST.faceEntries||!Object.keys(ST.faceEntries).length){ wrap.innerHTML='<div style="font-size:13px;color:var(--muted);">Первая практика появится здесь.</div>'; return; }
+  wrap.innerHTML=Object.keys(ST.faceEntries).sort().reverse().map(k=>{
+    const done=FACE_EXERCISES.filter(e=>ST.faceEntries[k][e.id]).length;
+    const pct=Math.round(done/FACE_EXERCISES.length*100);
+    const col=pct===100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);"><span style="font-size:13px;min-width:60px;">${fmtDate(k)}</span><div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:4px;width:${pct}%;background:${col};border-radius:2px;"></div></div><span style="font-size:12px;color:var(--muted);">${done}/${FACE_EXERCISES.length}</span></div>`;
+  }).join('');
+}
+
+// ══ MEASURES ══
+function saveMeasure(){
+  const w=gv('inp-waist'), wt=gv('inp-weight-m'), h=gv('inp-hips');
+  if(!w&&!wt){ toast('Введи хотя бы один параметр'); return; }
+  ST.measures.unshift({date:todayKey(), waist:w, weight:wt, hips:h});
+  save(); renderMeasures(); renderStrengthProgress();
+  ['inp-waist','inp-weight-m','inp-hips'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  toast('Замер сохранён ✓');
+}
+
+function deleteMeasure(i){ ST.measures.splice(i,1); save(); renderMeasures(); }
+
+function renderMeasures(){
+  const list=document.getElementById('measures-list'); if(!list) return;
+  if(!ST.measures.length){ list.innerHTML='<div class="empty"><span>📏</span>Первый замер — стартовая точка.</div>'; return; }
+  list.innerHTML=ST.measures.map((m,i)=>{
+    const prev=ST.measures[i+1];
+    const diff=prev&&m.waist&&prev.waist?(parseFloat(m.waist)-parseFloat(prev.waist)).toFixed(1):null;
+    return `<div class="meas-card"><div class="meas-head"><span class="meas-date">${fmtDate(m.date)}</span>${diff!==null?`<span class="${diff<=0?'meas-diff-neg':'meas-diff-pos'}">${diff>0?'+':''}${diff} см</span>`:''}<button onclick="deleteMeasure(${i})" style="margin-left:auto;background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;">✕</button></div><div class="meas-vals">${m.waist?`<span>Талия <b>${m.waist}</b> см</span>`:''} ${m.weight?`<span>Вес <b>${m.weight}</b> кг</span>`:''} ${m.hips?`<span>Бёдра <b>${m.hips}</b> см</span>`:''}</div></div>`;
+  }).join('');
+}
+
+function renderStrengthProgress(){
+  const p=ST.profile;
+  ['low','up'].forEach(tab=>{
+    const wrap=document.getElementById(`strength-progress-${tab}`); if(!wrap) return;
+    const exList=tab==='low'?(p.exLow||DEFAULT_EX_LOW):(p.exUp||DEFAULT_EX_UP);
+    const history={};
+    exList.forEach(ex=>history[ex.id]=[]);
+    (ST.workouts||[]).filter(w=>w.type==='strength'&&w.tab===tab).reverse().forEach(w=>{
+      exList.forEach(ex=>{ const d=w.exercises?.[ex.id]; if(d&&(d.w||d.s)) history[ex.id].push({date:fmtDate(w.date),w:d.w,s:d.s}); });
+    });
+    wrap.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <tr style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);">
+        <td style="padding:4px 0 8px;">Упражнение</td><td style="padding:4px 8px 8px;text-align:center;">Старт</td><td style="padding:4px 0 8px;text-align:center;">Сейчас</td><td style="padding:4px 0 8px;text-align:center;">△</td>
+      </tr>
+      ${exList.map(ex=>{
+        const arr=history[ex.id];
+        if(!arr.length) return `<tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;">${ex.name}</td><td style="text-align:center;color:var(--muted);">—</td><td style="text-align:center;color:var(--muted);">—</td><td style="text-align:center;color:var(--muted);">—</td></tr>`;
+        const first=arr[0], last=arr[arr.length-1];
+        const fw=parseFloat(first.w)||0, lw=parseFloat(last.w)||0;
+        const diff=fw&&lw?(lw-fw).toFixed(1):null;
+        const diffStr=diff===null?'—':diff>0?`<span style="color:var(--green);">+${diff}</span>`:diff<0?`<span style="color:var(--red);">${diff}</span>`:'=';
+        return `<tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;">${ex.name}</td><td style="padding:4px 8px;text-align:center;color:var(--muted);">${first.w?first.w+'кг':'—'}<br><span style="font-size:10px;">${first.s||''}</span></td><td style="text-align:center;font-weight:500;">${last.w?last.w+'кг':'—'}<br><span style="font-size:10px;color:var(--muted);">${last.s||''}</span></td><td style="text-align:center;">${diffStr}</td></tr>`;
+      }).join('')}
+    </table>`;
+  });
+}
+
+// ══ CYCLE ══
+function markCycle(type){
+  if(!ST.cycle) ST.cycle={};
+  const k=todayKey();
+  if(type==='none') delete ST.cycle[k]; else ST.cycle[k]=type;
+  save(); renderCycleGrid(); renderCycleStats(); updateDayBadge();
+}
+function cycleDayClick(k){
+  if(!ST.cycle) ST.cycle={};
+  const cur=ST.cycle[k];
+  if(!cur) ST.cycle[k]='mens';
+  else if(cur==='mens') ST.cycle[k]='spot';
+  else delete ST.cycle[k];
+  save(); renderCycleGrid(); renderCycleStats(); updateDayBadge();
+}
+function renderCycleGrid(){
+  const wrap=document.getElementById('cycle-grid'); if(!wrap) return;
+  if(!ST.cycle) ST.cycle={};
+  const today=new Date(); today.setHours(0,0,0,0);
+  let html='';
+  for(let i=69;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    const type=ST.cycle[k];
+    const isToday=i===0;
+    let bg='background:var(--surface);border:1px solid var(--border);';
+    if(type==='mens') bg='background:rgba(163,64,64,0.35);border:1px solid var(--red);';
+    if(type==='spot') bg='background:rgba(181,129,58,0.3);border:1px solid var(--amber);';
+    const outline=isToday?'outline:2px solid var(--accent);outline-offset:1px;':'';
+    html+=`<div class="cycle-day" style="${bg}${outline}" title="${k}" onclick="cycleDayClick('${k}')"></div>`;
+  }
+  wrap.innerHTML=html;
+}
+function renderCycleStats(){
+  const el=document.getElementById('cycle-stats'); if(!el) return;
+  const mensDays=Object.keys(ST.cycle||{}).filter(k=>ST.cycle[k]==='mens').sort();
+  if(!mensDays.length){ el.textContent='Менструаций ещё не отмечено.'; return; }
+  const last=mensDays[mensDays.length-1];
+  const diff=Math.round((new Date(todayKey())-new Date(last))/86400000);
+  let html=`Последняя менструация: <b>${fmtDate(last)}</b> · ${diff} дн. назад`;
+  const periods=[]; let cur=[mensDays[0]];
+  for(let i=1;i<mensDays.length;i++){
+    if((new Date(mensDays[i])-new Date(mensDays[i-1]))/86400000<=2) cur.push(mensDays[i]);
+    else { periods.push(cur); cur=[mensDays[i]]; }
+  }
+  periods.push(cur);
+  if(periods.length>=2){
+    const gaps=[];
+    for(let i=1;i<periods.length;i++) gaps.push(Math.round((new Date(periods[i][0])-new Date(periods[i-1][0]))/86400000));
+    const avg=Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);
+    html+=`<br>Средний цикл: <b>${avg} дн.</b>`;
+  }
+  el.innerHTML=html;
+}
+
+// ══ BUILD TABS ══
+function buildTabs(activeId){
+  const p=ST.profile;
+  const m=p.modules||{};
+  const tabs=[
+    {id:'daily',name:'Главная'},
+    {id:'workouts',name:'Тренировки'},
+    ...(m.stretch?[{id:'stretch',name:'Растяжка'}]:[]),
+    ...(m.face?[{id:'face',name:'Лицо'}]:[]),
+    {id:'measures',name:'Динамика'},
+    ...(m.cycle&&p.phase==='pre'?[{id:'cycle',name:'Цикл'}]:[]),
+    {id:'analysis',name:'Анализ'},
+    {id:'log',name:'Дневник'},
+  ];
+  const active=activeId||'daily';
+  const tc=document.getElementById('tabs-container');
+  tc.innerHTML=tabs.map(t=>`<button class="tab${t.id===active?' active':''}" onclick="switchTab('${t.id}')" id="tab-${t.id}">${t.name}</button>`).join('');
+}
+
+// ══ ANALYSIS ══
+function setPeriod(d){
+  analysisPeriod=d;
+  document.querySelectorAll('[id^="per-"]').forEach(b=>{ b.style.borderColor=''; b.style.color=''; });
+  const el=document.getElementById('per-'+d);
+  if(el){ el.style.borderColor='var(--accent)'; el.style.color='var(--accent)'; }
+}
+
+function getEntriesForPeriod(days){
+  const keys=Object.keys(ST.entries).sort();
+  if(!days) return keys;
+  const cutoff=new Date(); cutoff.setDate(cutoff.getDate()-days);
+  return keys.filter(k=>new Date(k)>=cutoff);
+}
+
+function renderWeekDots(){
+  const wrap=document.getElementById('week-dots'); if(!wrap) return;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const selected=gv('save-date')||todayKey();
+  // Показываем с даты регистрации до сегодня
+  const startDate=ST.profile?.startDate ? new Date(ST.profile.startDate) : new Date(today);
+  startDate.setHours(0,0,0,0);
+  const totalDays=Math.round((today-startDate)/86400000)+1;
+  let html='';
+  for(let i=totalDays-1;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const k=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    const filled=!!ST.entries[k];
+    const isSelected=k===selected;
+    const isToday=i===0;
+    const dayName=DAY_NAMES[d.getDay()];
+    const dayNum=d.getDate();
+    const bg=filled?'var(--green)':isToday?'var(--accent2)':'var(--border-mid)';
+    const outline=isSelected?'box-shadow:0 0 0 2px var(--accent);':'';
+    html+=`<div onclick="selectDay('${k}')" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;">
+      <div style="font-size:9px;color:var(--muted);">${dayName}</div>
+      <div style="width:26px;height:26px;border-radius:50%;background:${bg};${outline}display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:${filled||isToday?'#fff':'var(--muted)'};">${dayNum}</div>
+    </div>`;
+  }
+  wrap.innerHTML=html;
+}
+
+function selectDay(k){
+  const sd=document.getElementById('save-date'); if(sd) sd.value=k;
+  loadEntryForDate(k);
+  renderWeekDots();
+}
+
+function renderCorrelations(){
+  const keys=getEntriesForPeriod(analysisPeriod);
+  const card=document.getElementById('corr-card');
+  const wrap=document.getElementById('corr-content');
+  if(!card||!wrap) return;
+  if(keys.length<5){ card.style.display='none'; return; }
+  card.style.display='block';
+  const factors=[
+    {id:'str-done', label:'💪 Силовая', type:'workout-str'},
+    {id:'cardio-done', label:'🏔 Кардио', type:'workout-cardio'},
+    ...(ST.profile.symptoms||[]).map(s=>({id:'sym-'+s, label:SYMPTOM_LABELS[s]||s, type:'sym'})),
+    ...(ST.profile.supplements||[]).map(s=>({id:'supp-'+s, label:SUPPLEMENT_LABELS[s]||s, type:'supp'})),
+  ];
+  const outcomes=['energy','sleep','mood'];
+  const outLabels={energy:'⚡ Энергия',sleep:'🌙 Сон',mood:'☀️ Настроение'};
+  let html='';
+  factors.forEach(f=>{
+    const daysWithF=keys.filter(k=>{
+      const e=ST.entries[k];
+      if(f.type==='workout-str') return (ST.workouts||[]).some(w=>w.type==='strength'&&w.date===k);
+      if(f.type==='workout-cardio') return (ST.workouts||[]).some(w=>w.type==='cardio'&&w.date===k);
+      if(f.type==='sym') return e?.symptoms?.[f.id.replace('sym-','')];
+      if(f.type==='supp') return e?.supplements?.[f.id.replace('supp-','')];
+      return e?.checks?.[f.id];
+    });
+    const daysWithout=keys.filter(k=>!daysWithF.includes(k));
+    if(daysWithF.length<2||daysWithout.length<2) return;
+    outcomes.forEach(out=>{
+      const avg=arr=>arr.reduce((s,k)=>s+(parseFloat(ST.entries[k]?.[out])||0),0)/arr.length;
+      const withAvg=avg(daysWithF), withoutAvg=avg(daysWithout);
+      const diff=withAvg-withoutAvg;
+      if(Math.abs(diff)>=0.7){
+        const sign=diff>0?'+':'';
+        const col=diff>0?'var(--green)':'var(--red)';
+        html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <span style="flex:1;">${f.label} → ${outLabels[out]}</span>
+          <span style="color:${col};font-weight:500;">${sign}${diff.toFixed(1)}</span>
+        </div>`;
+      }
+    });
+  });
+  wrap.innerHTML=html||'<div style="font-size:13px;color:var(--muted);">Накопи больше данных — корреляции появятся автоматически.</div>';
+}
+
+function updateAnalysisButtons(){
+  if(!ST.analysisLog) ST.analysisLog={};
+  const today=new Date(); today.setHours(0,0,0,0);
+
+  // Week button
+  const btnW=document.getElementById('btn-week-analysis');
+  const hintW=document.getElementById('hint-week-analysis');
+  const last7keys=getEntriesForPeriod(7);
+  const filledDays=last7keys.length;
+  const lastWeekUsed=ST.analysisLog.week ? new Date(ST.analysisLog.week) : null;
+  const daysSinceWeek=lastWeekUsed ? Math.floor((today-lastWeekUsed)/86400000) : 999;
+
+  if(filledDays<7){
+    const need=7-filledDays;
+    btnW.disabled=true; btnW.style.opacity='0.45'; btnW.style.cursor='default';
+    hintW.style.display='block';
+    hintW.textContent=`Заполните ещё ${need} ${need===1?'день':need<5?'дня':'дней'} — тогда станет доступен анализ недели.`;
+  } else if(daysSinceWeek<7){
+    const daysLeft=7-daysSinceWeek;
+    btnW.disabled=true; btnW.style.opacity='0.45'; btnW.style.cursor='default';
+    hintW.style.display='block';
+    hintW.textContent=`Следующий анализ недели через ${daysLeft} ${daysLeft===1?'день':daysLeft<5?'дня':'дней'}.`;
+  } else {
+    btnW.disabled=false; btnW.style.opacity=''; btnW.style.cursor='';
+    hintW.style.display='none';
+  }
+
+  // All-period button
+  const btnA=document.getElementById('btn-all-analysis');
+  const hintA=document.getElementById('hint-all-analysis');
+  const allKeys=getEntriesForPeriod(0);
+  const filledAll=allKeys.length;
+  const lastAllUsed=ST.analysisLog.all ? new Date(ST.analysisLog.all) : null;
+  const daysSinceAll=lastAllUsed ? Math.floor((today-lastAllUsed)/86400000) : 999;
+
+  if(filledAll<30){
+    const need=30-filledAll;
+    btnA.disabled=true; btnA.style.opacity='0.45'; btnA.style.cursor='default';
+    hintA.style.display='block';
+    hintA.textContent=`Заполните ещё ${need} ${need===1?'день':need<5?'дня':'дней'} — откроется анализ всего периода.`;
+  } else if(daysSinceAll<30){
+    const daysLeft=30-daysSinceAll;
+    btnA.disabled=true; btnA.style.opacity='0.45'; btnA.style.cursor='default';
+    hintA.style.display='block';
+    hintA.textContent=`Следующий анализ периода через ${daysLeft} ${daysLeft===1?'день':daysLeft<5?'дня':'дней'}.`;
+  } else {
+    btnA.disabled=false; btnA.style.opacity=''; btnA.style.cursor='';
+    hintA.style.display='none';
+  }
+}
+
+async function runAnalysis(mode='week'){
+  // Check limits
+  if(!ST.analysisLog) ST.analysisLog={};
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(mode==='week'){
+    const filledDays=getEntriesForPeriod(7).length;
+    if(filledDays<7){ toast('Заполните ещё '+(7-filledDays)+' дней'); return; }
+    const lastUsed=ST.analysisLog.week ? new Date(ST.analysisLog.week) : null;
+    if(lastUsed && Math.floor((today-lastUsed)/86400000)<7){ toast('Анализ недели уже был на этой неделе'); return; }
+  }
+  if(mode==='all'){
+    const allKeys=getEntriesForPeriod(0);
+    if(allKeys.length<30){
+      const need=30-allKeys.length;
+      toast('Заполните ещё '+need+' '+( need===1?'день':need<5?'дня':'дней')+' — тогда откроется анализ периода'); return;
+    }
+    const lastUsed=ST.analysisLog.all ? new Date(ST.analysisLog.all) : null;
+    if(lastUsed && Math.floor((today-lastUsed)/86400000)<30){ toast('Анализ периода доступен раз в месяц'); return; }
+  }
+
+  const p=ST.profile;
+  const keys=getEntriesForPeriod(mode==='all'?0:7);
+  if(!keys.length){ toast('Нет данных за этот период'); return; }
+  const result=document.getElementById('ai-result');
+  const content=document.getElementById('ai-content');
+  result.style.display='block';
+  content.innerHTML=`<div class="ai-loading">✦ ${mode==='all'?'Анализирую весь период...':'Анализирую данные...'}</div>`;
+
+  const entries=keys.map(k=>({date:k,...ST.entries[k]}));
+  const summary=entries.map(e=>{
+    const walkStr=[(e.walkFat?`жиросжигание ${e.walkFat}мин`:''),(e.walkAer?`аэробная ${e.walkAer}мин`:''),(e.walkAna?`анаэробная ${e.walkAna}мин`:'')].filter(Boolean).join(', ')||'—';
+    const hasStr=(ST.workouts||[]).some(w=>w.type==='strength'&&w.date===e.date);
+    const hasCard=(ST.workouts||[]).some(w=>w.type==='cardio'&&w.date===e.date);
+    const anxStr=(e.anxiety&&parseInt(e.anxiety)>0)?`тревога ${e.anxiety}/10${e.anxietyNote?` (${e.anxietyNote})`:""}`:"";
+    const symStr=[...Object.entries(e.symptoms||{}).filter(([,v])=>v).map(([k])=>SYMPTOM_LABELS[k]||k),anxStr].filter(Boolean).join(", ")||"—";
+    const suppStr=Object.entries(e.supplements||{}).filter(([,v])=>v).map(([k])=>SUPPLEMENT_LABELS[k]||k).join(", ")||"—";
+    return `${fmtDate(e.date)}: энергия ${e.energy||"—"}/10, сон ${e.sleep||"—"}/10, настроение ${e.mood||"—"}/10, белок ${e.protein||"—"}г, ккал ${e.kcal||"—"}, клетчатка ${e.fiber||"—"}г, ходьба: ${walkStr}, силовая: ${hasStr?"да":"нет"}, кардио: ${hasCard?"да":"нет"}, симптомы: ${symStr}, добавки: ${suppStr}${e.extStress?", стрессор: "+(e.extStressText||"да"):""}${e.note?", заметка: "+e.note:""}`;
+  }).join('\n');
+  const phaseLabels={pre:'пременопауза',meno:'менопауза',post:'постменопауза'};
+  const phase=phaseLabels[p.phase]||'пременопауза';
+
+  // Workout counts
+  const periodStart=keys[0], periodEnd=keys[keys.length-1];
+  const wInPeriod=(ST.workouts||[]).filter(w=>w.date>=periodStart&&w.date<=periodEnd);
+  const strCount=wInPeriod.filter(w=>w.type==='strength').length;
+  const cardioCount=wInPeriod.filter(w=>w.type==='cardio').length;
+
+  // Measures
+  let measBlock='';
+  if(ST.measures.length>=2){
+    const sorted=[...ST.measures].sort((a,b)=>a.date.localeCompare(b.date));
+    const f=sorted[0], l=sorted[sorted.length-1];
+    const wDiff=f.weight&&l.weight?(parseFloat(l.weight)-parseFloat(f.weight)).toFixed(1):null;
+    const cDiff=f.waist&&l.waist?(parseFloat(l.waist)-parseFloat(f.waist)).toFixed(1):null;
+    measBlock=`\nДинамика замеров: вес ${f.weight||'—'}→${l.weight||'—'}кг${wDiff!==null?` (${wDiff>0?'+':''}${wDiff})`:''}, талия ${f.waist||'—'}→${l.waist||'—'}см${cDiff!==null?` (${cDiff>0?'+':''}${cDiff})`:''}.`;
+  }
+
+  // Cortisol & anxiety summary
+  const anxDays=entries.filter(e=>e.anxiety&&parseInt(e.anxiety)>0);
+  const avgAnxiety=anxDays.length ? (anxDays.reduce((s,e)=>s+parseInt(e.anxiety),0)/anxDays.length).toFixed(1) : null;
+  const stressDays=entries.filter(e=>e.extStress);
+  const cortisolBlock=anxDays.length>0
+    ? `
+Кортизол и тревога: тревога отмечалась ${anxDays.length} из ${entries.length} дней, средний уровень ${avgAnxiety}/10.${stressDays.length?' Внешние стрессоры: '+stressDays.map(e=>fmtDate(e.date)+(e.extStressText?' ('+e.extStressText+')':'')).join('; ')+'.':''}`
+    : '';
+
+  // Spheres summary (if module enabled)
+  const hasSpheres=ST.profile.modules?.spheres && (ST.profile.spheres||[]).length>0;
+  const sphereNames=(ST.profile.spheres||[]).map(s=>s.name).filter(Boolean);
+  let spheresBlock='';
+  if(hasSpheres){
+    const sphereData=sphereNames.map(name=>{
+      const daysWithStep=entries.filter(e=>{
+        const sphere=(ST.profile.spheres||[]).find(s=>s.name===name);
+        if(!sphere) return false;
+        return e.spheres && e.spheres[sphere.emoji+name];
+      });
+      return `${name}: шаг отмечен ${daysWithStep.length} из ${entries.length} дней`;
+    }).join('; ');
+    spheresBlock=sphereData ? `
+Сферы жизни: ${sphereData}.` : '';
+  }
+
+  const weekPrompt=`Ты — персональный помощник женщины в ${phase}.
+Профиль: ${p.age} лет, рост ${p.height||'—'}см, вес ${p.weight||'—'}кг.
+Цели: калории ${p.kcalGoal} ккал, белок ${p.proteinGoal}+ г.
+Отслеживаемые симптомы: ${(p.symptoms||[]).map(s=>SYMPTOM_LABELS[s]||s).join(', ')||'—'}.
+
+Данные за 7 дней (${keys.length} записей):
+${summary}
+
+Тренировок за период: силовые — ${strCount}, кардио — ${cardioCount}.
+Дни отдыха между тренировками — норма, не комментируй их как недостаток.${measBlock}${cortisolBlock}${spheresBlock}
+
+Структура ответа на русском языке:
+**Что работает** — конкретные паттерны из данных
+**Что буксует** — честно, с механизмом
+**Питание** — средний белок и ккал, соответствие целям, конкретные продукты для коррекции если нужно
+**Гипотеза** — что больше всего влияет на энергию и настроение по данным
+**На следующий период** — одно изменение в питании, одно в режиме
+${cortisolBlock?`**Кортизол и тревога** — динамика за неделю, связь с внешними событиями если есть. Признай как реальную нагрузку, без советов и без преуменьшения.`:''}
+${spheresBlock?`**Сферы жизни** — по каким направлениям был прогресс, по каким нет. Без морализаторства.`:''}
+
+Тон: как разговор с умной подругой-врачом — прямо, тепло, без лести и без нотаций. Конкретные цифры из данных. Максимум 350 слов.`;
+
+  const allPrompt=`Ты — персональный помощник женщины в ${phase}.
+Профиль: ${p.age} лет. Цели: ${p.kcalGoal} ккал, белок ${p.proteinGoal}+ г.
+
+Данные за весь период (${keys.length} дней):
+${summary}
+
+Тренировок: силовые — ${strCount}, кардио — ${cardioCount}.${measBlock}${cortisolBlock}${spheresBlock}
+
+Это анализ ВСЕГО периода от первого до последнего дня. Структура:
+**Общая динамика** — энергия, настроение, сон: первая треть vs последняя треть периода, есть ли улучшение
+**Тело** — замеры и тренировки в динамике, конкретные цифры
+**Питание** — средние показатели, стабильность, что влияет на отклонения
+**Симптомы** — динамика если есть данные
+**Ключевые корреляции** — что стабильно совпадает с хорошими днями
+${cortisolBlock?`**Кортизол и тревога** — динамика за весь период, паттерны связи с самочувствием и внешними событиями. Признай как реальную нагрузку.`:''}
+${spheresBlock?`**Сферы жизни** — по каким направлениям стабильный прогресс, по каким провалы. Без морализаторства, только наблюдение.`:''}
+**Главный вывод** — есть ли прогресс и в чём именно. Одна честная фраза.
+
+Тон: как умная подруга-врач подводит итог — честно, тепло, без лести. Конкретные цифры. Максимум 450 слов.`;
+
+  try {
+    const resp=await fetch('https://sleep-api.vercel.app/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-5-20250929',max_tokens:1500,messages:[{role:'user',content:mode==='all'?allPrompt:weekPrompt}]})
+    });
+    const data=await resp.json();
+    const text=data.content?.map(c=>c.text||'').join('')||'Ошибка получения ответа.';
+    content.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    // Записываем дату использования
+    if(!ST.analysisLog) ST.analysisLog={};
+    ST.analysisLog[mode]=todayKey();
+    saveData();
+    updateAnalysisButtons();
+  } catch(e){
+    content.innerHTML='<div style="font-size:13px;color:var(--red);">Не удалось получить анализ. Проверь подключение.</div>';
+  }
+}
+
+// ══ LOG ══
+function renderLog(){
+  const wrap=document.getElementById('log-list'); if(!wrap) return;
+  const keys=Object.keys(ST.entries).sort().reverse();
+  if(!keys.length){ wrap.innerHTML='<div class="empty"><span>📓</span>Записи появятся здесь.</div>'; return; }
+  wrap.innerHTML=keys.map(k=>{
+    const e=ST.entries[k];
+    const pills=[];
+    if(e.energy) pills.push(`⚡${e.energy}`);
+    if(e.sleep) pills.push(`🌙${e.sleep}`);
+    if(e.mood) pills.push(`☀️${e.mood}`);
+    if(e.protein) pills.push(`🥩${e.protein}г`);
+    if(e.kcal) pills.push(`${e.kcal}ккал`);
+    if(e.steps) pills.push(`👟${parseInt(e.steps).toLocaleString('ru')}`);
+    const hasStr=(ST.workouts||[]).some(w=>w.type==='strength'&&w.date===k);
+    const hasCard=(ST.workouts||[]).some(w=>w.type==='cardio'&&w.date===k);
+    if(hasStr) pills.push('💪');
+    if(hasCard) pills.push('🏔');
+    return `<div class="log-entry" onclick="loadEntryFromLog('${k}')"><div class="log-date">${fmtDate(k)} ${DAY_NAMES[new Date(k).getDay()]}</div><div class="log-pills">${pills.map(p=>`<span class="pill">${p}</span>`).join('')}</div>${e.note?`<div style="font-size:12px;color:var(--muted);margin-top:6px;">${e.note}</div>`:''}</div>`;
+  }).join('');
+}
+
+function loadEntryFromLog(k){
+  const sd=document.getElementById('save-date'); if(sd) sd.value=k;
+  loadEntryForDate(k);
+  switchTab('daily');
+  toast(`Загружено: ${fmtDate(k)}`);
+}
+
+// ══ PROFILE ══
+const SYMPTOM_OPTIONS=[
+  {val:'hotflash',label:'🔥 Приливы'},{val:'anxiety',label:'😰 Тревожность'},{val:'brain-fog',label:'🌫 Туман в голове'},
+  {val:'joint-pain',label:'🦴 Боли в суставах'},{val:'mood-swings',label:'🌊 Перепады настроения'},{val:'bloating',label:'🫧 Вздутие'},
+  {val:'fatigue',label:'😴 Усталость'},{val:'headache',label:'💫 Головная боль'},
+];
+const SUPP_OPTIONS=[
+  {val:'magnesium',label:'💊 Магний'},{val:'iron',label:'🩸 Железо'},{val:'vitd',label:'☀️ Витамин D'},
+  {val:'omega',label:'🐟 Омега-3'},{val:'bcomplex',label:'💛 B-комплекс'},{val:'inositol',label:'🌿 Инозитол'},
+  {val:'ashwagandha',label:'🌱 Ашваганда'},{val:'collagen',label:'✨ Коллаген'},
+];
+const HORMONE_OPTIONS=[
+  {val:'progesterone',label:'🌙 Прогестерон'},{val:'estrogen-gel',label:'💧 Эстроген (гель)'},
+  {val:'estrogen-patch',label:'🩹 Эстроген (пластырь)'},{val:'combined-mht',label:'💊 Комбинированная МГТ'},
+  {val:'thyroxine',label:'⚡ Тироксин'},
+];
+
+function fillProfileForm(){
+  const p=ST.profile; if(!p) return;
+  const sv=(id,v)=>{ const el=document.getElementById(id); if(el&&v!==undefined) el.value=v; };
+  sv('p-name',p.name); sv('p-age',p.age); sv('p-height',p.height); sv('p-weight',p.weight);
+  sv('p-kcal-goal',p.kcalGoal); sv('p-protein-goal',p.proteinGoal);
+  const pPhase=document.getElementById('p-phase'); if(pPhase) pPhase.value=p.phase||'pre';
+
+  const renderPillGroup=(containerId, options, selected)=>{
+    const wrap=document.getElementById(containerId); if(!wrap) return;
+    wrap.innerHTML=options.map(o=>`<div class="pill-opt${selected?.includes(o.val)?' selected':''}" data-val="${o.val}" onclick="this.classList.toggle('selected')">${o.label}</div>`).join('');
+  };
+  renderPillGroup('p-symptoms', SYMPTOM_OPTIONS, p.symptoms);
+  renderPillGroup('p-supplements', SUPP_OPTIONS, p.supplements);
+  renderPillGroup('p-hormones', HORMONE_OPTIONS, p.hormones);
+  // Custom supps
+  const cs=document.getElementById('p-custom-supps');
+  if(cs) cs.value=(p.customSupps||[]).map(s=>typeof s==='object'?s.label:s).join(', ');
+
+  // Spheres
+  renderProfileSpheres();
+  // Exercises
+  renderProfileExercises('low');
+  renderProfileExercises('up');
+  // Modules
+  const m=p.modules||{};
+  ['cycle','stretch','face','spheres'].forEach(key=>{
+    const cb=document.getElementById('pm-cb-'+key);
+    if(cb) cb.classList.toggle('checked', !!m[key]);
+  });
+  // Скрыть цикл если не pre
+  const pmCycle=document.getElementById('pm-cycle');
+  if(pmCycle) pmCycle.style.display=(p.phase==='pre')?'':'none';
+  // Показ карточки сфер
+  const sc=document.getElementById('p-spheres-card');
+  if(sc) sc.style.display=m.spheres?'':'none';
+}
+
+function renderProfileSpheres(){
+  const p=ST.profile; if(!p) return;
+  const wrap=document.getElementById('p-spheres-list'); if(!wrap) return;
+  wrap.innerHTML=(p.spheres||[]).map((s,i)=>`
+    <div class="sphere-row" id="p-sphere-row-${i}">
+      <div class="sphere-emoji" onclick="pickProfileEmoji(${i})">${s.emoji}</div>
+      <input class="sphere-inp" type="text" value="${s.name}" id="p-sphere-name-${i}">
+      <button class="sphere-del" onclick="delProfileSphere(${i})">×</button>
+    </div>`).join('');
+}
+
+function addProfileSphere(){
+  ST.profile.spheres.push({emoji:EMOJIS[ST.profile.spheres.length%EMOJIS.length], name:''});
+  renderProfileSpheres();
+}
+function delProfileSphere(i){ ST.profile.spheres.splice(i,1); renderProfileSpheres(); }
+function pickProfileEmoji(i){
+  const chosen=prompt(`Выбери эмодзи:\n${EMOJIS.join(' ')}`);
+  if(chosen?.trim()){ ST.profile.spheres[i].emoji=chosen.trim(); renderProfileSpheres(); }
+}
+
+function renderProfileExercises(tab){
+  const p=ST.profile;
+  const exList=tab==='low'?(p.exLow||DEFAULT_EX_LOW):(p.exUp||DEFAULT_EX_UP);
+  const wrap=document.getElementById(`p-ex-${tab}`); if(!wrap) return;
+  wrap.innerHTML=exList.map((ex,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+      <input class="sphere-inp" style="flex:1;" type="text" value="${ex.name}" id="p-ex-${tab}-name-${i}">
+      <button onclick="delExercise('${tab}',${i})" style="background:none;border:none;color:var(--muted);font-size:14px;cursor:pointer;">×</button>
+    </div>`).join('');
+}
+
+function addExercise(tab){
+  const p=ST.profile;
+  const list=tab==='low'?p.exLow:p.exUp;
+  const newId='custom-'+Date.now();
+  list.push({id:newId, name:'Новое упражнение', desc:''});
+  renderProfileExercises(tab);
+}
+function delExercise(tab,i){
+  const p=ST.profile;
+  if(tab==='low') p.exLow.splice(i,1); else p.exUp.splice(i,1);
+  renderProfileExercises(tab);
+}
+
+function toggleProfileModule(key){
+  if(!ST.profile.modules) ST.profile.modules={};
+  ST.profile.modules[key]=!ST.profile.modules[key];
+  const cb=document.getElementById('pm-cb-'+key);
+  if(cb) cb.classList.toggle('checked', !!ST.profile.modules[key]);
+  // Цикл только при pre
+  if(key==='cycle' && ST.profile.phase!=='pre'){
+    ST.profile.modules.cycle=false;
+    if(cb) cb.classList.remove('checked');
+  }
+  // Показ/скрытие карточки сфер
+  const sc=document.getElementById('p-spheres-card');
+  if(sc) sc.style.display=ST.profile.modules.spheres?'':'none';
+}
+
+function saveProfile(){
+  const p=ST.profile;
+  p.name=gv('p-name'); p.age=parseInt(gv('p-age'))||p.age;
+  p.height=parseFloat(gv('p-height'))||p.height; p.weight=parseFloat(gv('p-weight'))||p.weight;
+  p.kcalGoal=parseInt(gv('p-kcal-goal'))||p.kcalGoal; p.proteinGoal=parseInt(gv('p-protein-goal'))||p.proteinGoal;
+  p.phase=document.getElementById('p-phase')?.value||p.phase;
+  p.symptoms=Array.from(document.querySelectorAll('#p-symptoms .pill-opt.selected')).map(el=>el.dataset.val);
+  p.supplements=Array.from(document.querySelectorAll('#p-supplements .pill-opt.selected')).map(el=>el.dataset.val);
+  p.hormones=Array.from(document.querySelectorAll('#p-hormones .pill-opt.selected')).map(el=>el.dataset.val);
+  p.customSupps=gv('p-custom-supps').split(',').map(s=>s.trim()).filter(Boolean).map(s=>({id:'custom-'+s.replace(/\s+/g,'-').toLowerCase(), label:s}));
+
+  // Spheres
+  p.spheres.forEach((s,i)=>{ const inp=document.getElementById(`p-sphere-name-${i}`); if(inp) s.name=inp.value; });
+
+  // Exercises names
+  p.exLow.forEach((ex,i)=>{ const inp=document.getElementById(`p-ex-low-name-${i}`); if(inp) ex.name=inp.value; });
+  p.exUp.forEach((ex,i)=>{ const inp=document.getElementById(`p-ex-up-name-${i}`); if(inp) ex.name=inp.value; });
+
+  save();
+  // Save modules from profile checkboxes
+  if(!p.modules) p.modules={};
+  ['cycle','stretch','face','spheres'].forEach(key=>{
+    const cb=document.getElementById('pm-cb-'+key);
+    if(cb) p.modules[key]=cb.classList.contains('checked');
+  });
+  if(p.phase!=='pre') p.modules.cycle=false;
+  // Rebuild tabs
+  buildTabs();
+  // Rebuild dynamic sections
+  document.getElementById('hint-protein').textContent=`цель ${p.proteinGoal}+ г`;
+  document.getElementById('hint-kcal').textContent=`цель ${p.kcalGoal} ккал`;
+  buildDailySymptoms(); buildDailySupplements(); buildDailySpheres(); buildWorkoutRows();
+  toast('Профиль сохранён ✓');
+}
+
+// ══ PILL GROUPS ONBOARDING ══
+document.querySelectorAll('.pill-opt').forEach(el=>{
+  el.addEventListener('click',function(){ this.classList.toggle('selected'); });
+});
+
+// ══ INIT ══
+load();
+
+function checkAccessAndStart(){
+  if(!ST.profile){
+    obRender();
+    renderObSpheres();
+    return;
+  }
+  // Проверка 90-дневного доступа
+  const start=ST.profile.startDate ? new Date(ST.profile.startDate) : null;
+  if(start){
+    const daysPassed=Math.floor((new Date()-start)/86400000);
+    if(daysPassed>90){
+      showAccessExpired();
+      return;
+    }
+  }
+  document.getElementById('onboarding').style.display='none';
+  initApp();
+}
+
+function showAccessExpired(){
+  document.getElementById('onboarding').style.display='none';
+  const app=document.getElementById('app');
+  app.style.display='block';
+  app.innerHTML=`<div style="max-width:480px;margin:60px auto;padding:24px;text-align:center;font-family:var(--sans);">
+    <div style="font-family:var(--serif);font-size:24px;color:var(--accent);margin-bottom:16px;">90 дней завершены</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px;">Твой период доступа к трекеру закончился.<br>Все данные сохранены.</div>
+    <div style="font-size:13px;color:var(--muted);">Для продолжения — напиши нам.</div>
+  </div>`;
+}
+
+// Firebase auth flow
+if(window._firebaseReady && window._firebaseAuth){
+  const {onAuthStateChanged}=window._firebaseAuthFns;
+  onAuthStateChanged(window._firebaseAuth, async (user)=>{
+    if(user){
+      document.getElementById('auth-screen')?.remove();
+      await loadFromFirebase(user.uid);
+      checkAccessAndStart();
+    } else {
+      showAuthScreen();
+    }
+  });
+} else {
+  // Firebase не загрузился — работаем с localStorage
+  checkAccessAndStart();
+}
+
+function showAuthScreen(){
+  let screen=document.getElementById('auth-screen');
+  if(!screen){
+    screen=document.createElement('div');
+    screen.id='auth-screen';
+    screen.style.cssText='position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;';
+    screen.innerHTML=`<div style="max-width:360px;width:100%;text-align:center;">
+      <div style="font-family:var(--serif);font-size:26px;font-weight:300;color:var(--accent);margin-bottom:8px;">Трансформация в менопаузу</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.6;">Войди чтобы открыть трекер.<br>Твои данные синхронизируются между устройствами.</div>
+      <button onclick="signInGoogle()" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:12px;">Войти через Google</button>
+      <div id="auth-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none;"></div>
+    </div>`;
+    document.body.appendChild(screen);
+  }
+}
+
+async function signInGoogle(){
+  try {
+    const {signInWithPopup,GoogleAuthProvider}=window._firebaseAuthFns;
+    await signInWithPopup(window._firebaseAuth, new GoogleAuthProvider());
+  } catch(e){
+    const err=document.getElementById('auth-error');
+    if(err){ err.textContent='Не удалось войти. Попробуй ещё раз.'; err.style.display='block'; }
+  }
+}
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqK7mFmCGbFqH8vX2pN9oR3sT1uV4wY6z",
+    authDomain: "sleep-program-app.firebaseapp.com",
+    projectId: "sleep-program-app",
+    storageBucket: "sleep-program-app.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abc123"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window._firebaseAuth = auth;
+  window._firebaseDb = db;
+  window._firebaseFirestore = { doc, setDoc, getDoc };
+  window._firebaseAuthFns = { onAuthStateChanged, signInWithPopup, GoogleAuthProvider };
+  window._firebaseReady = true;
+
+  // Trigger auth check now that Firebase is ready
+  onAuthStateChanged(auth, async (user) => {
+    if(user){
+      document.getElementById('auth-screen')?.remove();
+      if(typeof loadFromFirebase === 'function') await loadFromFirebase(user.uid);
+      if(typeof checkAccessAndStart === 'function') checkAccessAndStart();
+    } else {
+      if(typeof showAuthScreen === 'function') showAuthScreen();
+    }
+  });
+</script>
+</body>
+</html>
