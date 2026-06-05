@@ -929,26 +929,14 @@ function load(){
   if(!ST.faceEntries) ST.faceEntries={};
   if(!ST.analysisLog) ST.analysisLog={};
 }
-function cleanForFirestore(obj){
-  if(obj===null||obj===undefined) return null;
-  if(Array.isArray(obj)) return obj.map(cleanForFirestore).filter(v=>v!==undefined);
-  if(typeof obj==='object'){
-    const clean={};
-    for(const k of Object.keys(obj)){
-      const v=cleanForFirestore(obj[k]);
-      if(v!==undefined) clean[k]=v;
-    }
-    return clean;
-  }
-  return obj===undefined?null:obj;
-}
 function save(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(ST));
   if(window._firebaseDb && window._firebaseAuth?.currentUser){
     const uid=window._firebaseAuth.currentUser.uid;
     const {doc,setDoc}=window._firebaseFirestore;
-    const cleanData=cleanForFirestore(ST);
-    setDoc(doc(window._firebaseDb,'users',uid,'products','menopause-tracker'), cleanData).catch(e=>console.warn('Firestore save:',e));
+    // Убираем undefined рекурсивно — Firestore их не принимает
+    const clean=JSON.parse(JSON.stringify(ST, (k,v)=>v===undefined?null:v));
+    setDoc(doc(window._firebaseDb,'users',uid,'products','menopause-tracker'), clean).catch(e=>console.warn('Firestore save:',e));
   }
 }
 async function loadFromFirebase(uid){
