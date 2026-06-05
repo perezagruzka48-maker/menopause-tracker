@@ -2012,12 +2012,12 @@ ${spheresBlock?`**Сферы жизни** — по каким направлен
       body:JSON.stringify({model:'claude-sonnet-4-5-20250929',max_tokens:1500,messages:[{role:'user',content:mode==='all'?allPrompt:weekPrompt}]})
     });
     const data=await resp.json();
-    const text=data.content?.map(c=>c.text||'').join('')||'Ошибка получения ответа.';
+    const text=data.text||(data.content?.map(c=>c.text||'').join(''))||'Ошибка получения ответа.';
     content.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
     // Записываем дату использования
     if(!ST.analysisLog) ST.analysisLog={};
     ST.analysisLog[mode]=todayKey();
-    saveData();
+    save();
     updateAnalysisButtons();
   } catch(e){
     content.innerHTML='<div style="font-size:13px;color:var(--red);">Не удалось получить анализ. Проверь подключение.</div>';
