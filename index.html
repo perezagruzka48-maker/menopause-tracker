@@ -689,6 +689,16 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px;
           <div class="ai-content" id="ai-content"></div>
         </div>
       </div>
+
+      <div class="card" id="saved-week-card" style="display:none;">
+        <div class="card-title" id="saved-week-date"></div>
+        <div class="ai-content" id="saved-week-content"></div>
+      </div>
+
+      <div class="card" id="saved-all-card" style="display:none;">
+        <div class="card-title" id="saved-all-date"></div>
+        <div class="ai-content" id="saved-all-content"></div>
+      </div>
       <div class="card" id="corr-card" style="display:none;">
         <div class="card-title">Корреляции</div>
         <div id="corr-content"></div>
@@ -801,8 +811,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px;
         <button class="add-sphere" style="margin-top:8px;" onclick="addExercise('up')">+ Добавить упражнение</button>
       </div>
 
-      <div class="flex-end" style="margin-bottom:30px;gap:10px;">
-        <button class="btn btn-ghost" style="font-size:12px;color:var(--muted);" onclick="ST.analysisLog={};save();updateAnalysisButtons();toast('История анализов сброшена');">Сбросить историю анализов</button>
+      <div class="flex-end" style="margin-bottom:30px;">
         <button class="btn btn-primary" onclick="saveProfile()">Сохранить профиль</button>
       </div>
     </div>
@@ -1364,7 +1373,7 @@ function switchTab(t){
   if(t==='face'){ loadFaceToday(); renderFaceHistory(); }
   if(t==='measures'){ renderMeasures(); renderStrengthProgress(); }
   if(t==='cycle'){ renderCycleGrid(); renderCycleStats(); }
-  if(t==='analysis'){ renderCorrelations(); updateAnalysisButtons(); }
+  if(t==='analysis'){ renderCorrelations(); updateAnalysisButtons(); renderSavedAnalysis(); }
   if(t==='log'){ renderLog(); }
   if(t==='profile'){ fillProfileForm(); }
 }
@@ -1719,6 +1728,28 @@ function renderCycleStats(){
   el.innerHTML=html;
 }
 
+function renderSavedAnalysis(){
+  if(!ST.analysisText) return;
+  const fmt=(mode)=>{
+    const card=document.getElementById('saved-'+mode+'-card');
+    const dateEl=document.getElementById('saved-'+mode+'-date');
+    const contentEl=document.getElementById('saved-'+mode+'-content');
+    if(!card||!dateEl||!contentEl) return;
+    const text=ST.analysisText?.[mode];
+    const date=ST.analysisLog?.[mode];
+    if(text){
+      card.style.display='block';
+      const label=mode==='week'?'Резюме недели':'Анализ периода';
+      dateEl.textContent=date?`${label} · ${fmtDate(date)}`:`${label}`;
+      contentEl.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    } else {
+      card.style.display='none';
+    }
+  };
+  fmt('week');
+  fmt('all');
+}
+
 // ══ BUILD TABS ══
 function buildTabs(activeId){
   const p=ST.profile;
@@ -1842,7 +1873,7 @@ function updateAnalysisButtons(){
   const lastWeekUsed=ST.analysisLog.week ? new Date(ST.analysisLog.week) : null;
   const daysSinceWeek=lastWeekUsed ? Math.floor((today-lastWeekUsed)/86400000) : 999;
 
-  if(filledDays<1){
+  if(filledDays<7){
     const need=7-filledDays;
     btnW.disabled=true; btnW.style.opacity='0.45'; btnW.style.cursor='default';
     hintW.style.display='block';
@@ -1865,8 +1896,8 @@ function updateAnalysisButtons(){
   const lastAllUsed=ST.analysisLog.all ? new Date(ST.analysisLog.all) : null;
   const daysSinceAll=lastAllUsed ? Math.floor((today-lastAllUsed)/86400000) : 999;
 
-  if(filledAll<1){
-    const need=1-filledAll;
+  if(filledAll<30){
+    const need=30-filledAll;
     btnA.disabled=true; btnA.style.opacity='0.45'; btnA.style.cursor='default';
     hintA.style.display='block';
     hintA.textContent=`Заполните ещё ${need} ${need===1?'день':need<5?'дня':'дней'} — откроется анализ всего периода.`;
@@ -1887,13 +1918,13 @@ async function runAnalysis(mode='week'){
   const today=new Date(); today.setHours(0,0,0,0);
   if(mode==='week'){
     const filledDays=getEntriesForPeriod(7).length;
-    if(filledDays<1){ toast('Заполните ещё '+(1-filledDays)+' дней'); return; }
+    if(filledDays<7){ toast('Заполните ещё '+(7-filledDays)+' дней'); return; }
     const lastUsed=ST.analysisLog.week ? new Date(ST.analysisLog.week) : null;
     if(lastUsed && Math.floor((today-lastUsed)/86400000)<7){ toast('Анализ недели уже был на этой неделе'); return; }
   }
   if(mode==='all'){
     const allKeys=getEntriesForPeriod(0);
-    if(allKeys.length<1){
+    if(allKeys.length<30){
       const need=30-allKeys.length;
       toast('Заполните ещё '+need+' '+( need===1?'день':need<5?'дня':'дней')+' — тогда откроется анализ периода'); return;
     }
@@ -2020,6 +2051,8 @@ ${spheresBlock?`**Сферы жизни** — по каким направлен
     // Записываем дату использования
     if(!ST.analysisLog) ST.analysisLog={};
     ST.analysisLog[mode]=todayKey();
+    ST.analysisText=ST.analysisText||{};
+    ST.analysisText[mode]=text;
     save();
     updateAnalysisButtons();
   } catch(e){
