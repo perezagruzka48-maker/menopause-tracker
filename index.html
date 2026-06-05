@@ -1093,14 +1093,27 @@ function renderObSummary(){
   const name=gv('ob-name')||'Дорогой пользователь';
   const kcal=gv('ob-kcal-goal')||'—';
   const protein=gv('ob-protein-goal')||'—';
+  // Кастомные добавки
+  const customSuppsRaw=gv('ob-custom-supps');
+  const customSupps=customSuppsRaw.split(',').map(s=>s.trim()).filter(Boolean);
+  const allSupps=[
+    ...[...getSelectedPills('ob-supplements'),...getSelectedPills('ob-hormones')].map(s=>SUPPLEMENT_LABELS[s]||s),
+    ...customSupps
+  ];
+  // Сферы из полей ввода (могли быть отредактированы)
+  const sphereNames=obSpheres.map((s,i)=>{
+    const inp=document.getElementById('ob-sphere-name-'+i);
+    const name=inp?inp.value:s.name;
+    return name?s.emoji+' '+name:'';
+  }).filter(Boolean);
   document.getElementById('ob-final-title').textContent=`Привет, ${name}! 🌸`;
   document.getElementById('ob-final-hint').textContent='Трекер настроен и готов к работе. Вот твои ключевые параметры:';
   document.getElementById('ob-summary').innerHTML=`
     <b>Калории:</b> ${kcal} ккал<br>
     <b>Белок:</b> ${protein} г<br>
     <b>Симптомы:</b> ${getSelectedPills('ob-symptoms').map(s=>SYMPTOM_LABELS[s]||s).join(', ')||'не выбраны'}<br>
-    <b>Добавки:</b> ${[...getSelectedPills('ob-supplements'),...getSelectedPills('ob-hormones')].map(s=>SUPPLEMENT_LABELS[s]||s).join(', ')||'не выбраны'}<br>
-    <b>Сферы:</b> ${obSpheres.filter(s=>s.name).map(s=>s.emoji+' '+s.name).join(', ')||'не добавлены'}
+    <b>Добавки:</b> ${allSupps.join(', ')||'не выбраны'}<br>
+    ${obModules.spheres?`<b>Сферы:</b> ${sphereNames.join(', ')||'не добавлены'}<br>`:''}
   `;
 }
 
@@ -1434,6 +1447,14 @@ function saveDay(){
   save();
   renderLog(); renderWeekDots();
   toast('День сохранён ✓');
+  // Визуальная обратная связь на кнопке
+  const btn=document.querySelector('[onclick="saveDay()"]');
+  if(btn){
+    const orig=btn.textContent;
+    btn.textContent='✓ Сохранено';
+    btn.style.background='var(--green)';
+    setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; }, 2000);
+  }
 }
 
 function loadEntryForDate(k){
