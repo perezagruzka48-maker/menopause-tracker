@@ -13,7 +13,7 @@
   --border: rgba(0,0,0,0.07);
   --border-mid: rgba(0,0,0,0.13);
   --text: #1a1714;
-  --muted: #8a8178;
+  --muted: #3d3a37;
   --accent: #7c6f5e;
   --accent2: #a08c78;
   --green: #5a7a5a;
@@ -1819,7 +1819,7 @@ function updateAnalysisButtons(){
   const lastWeekUsed=ST.analysisLog.week ? new Date(ST.analysisLog.week) : null;
   const daysSinceWeek=lastWeekUsed ? Math.floor((today-lastWeekUsed)/86400000) : 999;
 
-  if(filledDays<7){
+  if(filledDays<1){
     const need=7-filledDays;
     btnW.disabled=true; btnW.style.opacity='0.45'; btnW.style.cursor='default';
     hintW.style.display='block';
@@ -1864,7 +1864,7 @@ async function runAnalysis(mode='week'){
   const today=new Date(); today.setHours(0,0,0,0);
   if(mode==='week'){
     const filledDays=getEntriesForPeriod(7).length;
-    if(filledDays<7){ toast('Заполните ещё '+(7-filledDays)+' дней'); return; }
+    if(filledDays<1){ toast('Заполните ещё '+(1-filledDays)+' дней'); return; }
     const lastUsed=ST.analysisLog.week ? new Date(ST.analysisLog.week) : null;
     if(lastUsed && Math.floor((today-lastUsed)/86400000)<7){ toast('Анализ недели уже был на этой неделе'); return; }
   }
