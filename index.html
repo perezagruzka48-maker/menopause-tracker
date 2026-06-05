@@ -1946,21 +1946,23 @@ async function runAnalysis(mode='week'){
 Кортизол и тревога: тревога отмечалась ${anxDays.length} из ${entries.length} дней, средний уровень ${avgAnxiety}/10.${stressDays.length?' Внешние стрессоры: '+stressDays.map(e=>fmtDate(e.date)+(e.extStressText?' ('+e.extStressText+')':'')).join('; ')+'.':''}`
     : '';
 
-  // Spheres summary (if module enabled)
+  // Spheres summary (if module enabled) — передаём содержание заметок, не статистику
   const hasSpheres=ST.profile.modules?.spheres && (ST.profile.spheres||[]).length>0;
-  const sphereNames=(ST.profile.spheres||[]).map(s=>s.name).filter(Boolean);
   let spheresBlock='';
   if(hasSpheres){
-    const sphereData=sphereNames.map(name=>{
-      const daysWithStep=entries.filter(e=>{
-        const sphere=(ST.profile.spheres||[]).find(s=>s.name===name);
-        if(!sphere) return false;
-        return e.spheres && e.spheres[sphere.emoji+name];
+    const sphereEntries=[];
+    entries.forEach(e=>{
+      if(!e.spheres) return;
+      Object.keys(e.spheres).forEach(i=>{
+        const sp=ST.profile.spheres?.[parseInt(i)];
+        if(!sp) return;
+        const item=e.spheres[i];
+        if(item?.done || item?.note){
+          sphereEntries.push(`${fmtDate(e.date)} · ${sp.emoji} ${sp.name}${item.note?' — '+item.note:''}`);
+        }
       });
-      return `${name}: шаг отмечен ${daysWithStep.length} из ${entries.length} дней`;
-    }).join('; ');
-    spheresBlock=sphereData ? `
-Сферы жизни: ${sphereData}.` : '';
+    });
+    spheresBlock=sphereEntries.length ? `\nСферы жизни (записи за период):\n${sphereEntries.join('\n')}` : '';
   }
 
   const weekPrompt=`Ты — персональный помощник женщины в ${phase}.
